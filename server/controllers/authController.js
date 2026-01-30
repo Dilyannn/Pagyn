@@ -101,3 +101,39 @@ const getProfile = async (req, res) => {
   }
 };
 
+/**
+ * @desc Update user profile
+ * @route PUT /api/auth/profile
+ * @access Private
+ */
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.username = req.body.username || user.username;
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+        isPro: updatedUser.isPro,
+        token: generateToken(updatedUser),
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Profile Update Error:", error);
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
+};
+
+export { registerUser, loginUser, getProfile, updateProfile };
