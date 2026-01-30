@@ -75,3 +75,29 @@ const loginUser = async (req, res) => {
   }
 };
 
+/** 
+ * @desc Get current logged in user's profile
+ * @route GET /api/auth/profile
+ * @access Private
+ */
+const getProfile = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        isPro: user.isPro,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Profile Fetch Error:", error);
+    res.status(500).json({ message: "Server error", details: error.message });
+  }
+};
+
