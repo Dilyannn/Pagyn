@@ -1,8 +1,9 @@
-import React from 'react'
-
 function App() {
   return (
-    <div>App</div>
+    <div style={{ backgroundColor: 'white', color: 'black', padding: '1rem', minHeight: '100vh' }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>App is running</h1>
+      <p>This is a test to see if React is rendering.</p>
+    </div>
   )
 }
 

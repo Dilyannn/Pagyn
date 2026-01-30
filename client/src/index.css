@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-display: 'Nunito', sans-serif;
+  --font-body: 'PT Serif', serif;
+  --color-primary: #FAF9F6;
+  --color-primary-dark: #D4CFC1;
+  --color-secondary: #63a5a0;
+  --color-secondary-dark: #115E59;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #FAF9F6;
+  }
+}  
