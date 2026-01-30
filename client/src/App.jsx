@@ -1,9 +1,21 @@
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+
+import ProtectedRoute from './components/auth/ProtectedRoute'
+import LandingPage from './pages/LandingPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+
+
 function App() {
   return (
-    <div style={{ backgroundColor: 'white', color: 'black', padding: '1rem', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>App is running</h1>
-      <p>This is a test to see if React is rendering.</p>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Routes>
+    </>
   )
 }
 
