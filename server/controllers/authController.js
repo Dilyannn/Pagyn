@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-/** 
+/**
  * @desc Get current logged in user's profile
  * @route GET /api/auth/profile
  * @access Private

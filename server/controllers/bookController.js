@@ -1,4 +1,4 @@
-import Book from '../models/Book.js';
+import Book from "../models/Book.js";
 
 /**
  * @desc Create a new book
@@ -10,7 +10,7 @@ const createBook = async (req, res) => {
     const { title, author, subtitle, chapters } = req.body;
 
     if (!title || !author) {
-      return res.status(400).json({ message: 'Title and Author are required' });
+      return res.status(400).json({ message: "Title and Author are required" });
     }
 
     const bookData = {
@@ -29,7 +29,7 @@ const createBook = async (req, res) => {
 
     res.status(201).json(newBook);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -40,10 +40,12 @@ const createBook = async (req, res) => {
  */
 const getBooks = async (req, res) => {
   try {
-    const books = await Book.find({ userId: req.user._id }).sort({ createdAt: -1 }); // Latest books first
+    const books = await Book.find({ userId: req.user._id }).sort({
+      createdAt: -1,
+    }); // Latest books first
     res.status(200).json(books);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -55,18 +57,18 @@ const getBooks = async (req, res) => {
 const getBooksById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
-    
+
     if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
+      return res.status(404).json({ message: "Book not found" });
     }
-    
+
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     res.status(200).json(book);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -80,11 +82,11 @@ const updateBook = async (req, res) => {
     const book = await Book.findById(req.params.id);
 
     if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
+      return res.status(404).json({ message: "Book not found" });
     }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     // Create an update object from req.body
@@ -98,12 +100,12 @@ const updateBook = async (req, res) => {
     const updatedBook = await Book.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     res.status(200).json(updatedBook);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -117,18 +119,18 @@ const deleteBook = async (req, res) => {
     const book = await Book.findById(req.params.id);
 
     if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
+      return res.status(404).json({ message: "Book not found" });
     }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     await book.deleteOne();
 
-    res.status(200).json({ message: 'Book deleted successfully' });
+    res.status(200).json({ message: "Book deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -142,24 +144,24 @@ const updateBookCoverArt = async (req, res) => {
     const book = await Book.findById(req.params.id);
 
     if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
+      return res.status(404).json({ message: "Book not found" });
     }
 
     if (book.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     if (req.file) {
       book.coverArt = `${req.file.path}`;
     } else {
-      return res.status(400).json({ message: 'No cover art file uploaded' });
+      return res.status(400).json({ message: "No cover art file uploaded" });
     }
 
     const updatedBook = await book.save();
 
     res.status(200).json(updatedBook);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', details: err.message });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -170,4 +172,4 @@ export {
   updateBook,
   deleteBook,
   updateBookCoverArt,
-}
+};
