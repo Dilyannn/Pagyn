@@ -7,7 +7,21 @@ import Book from '../models/Book.js';
  */
 const createBook = async (req, res) => {
   try {
+    const { title, author, subtitle, chapters } = req.body;
 
+    if (!title || !author) {
+      return res.status(400).json({ message: 'Title and Author are required' });
+    }
+
+    const newBook = await Book.create({
+      userId: req.user._id,
+      title,
+      author,
+      subtitle,
+      chapters,
+    });
+
+    res.status(201).json(newBook);
   } catch (err) {
     res.status(500).json({ message: 'Server error', details: err.message });
   }
