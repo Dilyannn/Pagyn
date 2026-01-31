@@ -15,8 +15,8 @@ const router = express.Router();
 router.use(protect);
 
 //^ Book Routes
-router.route("/").post(createBook).get(getBooks);
-router.route("/:id").get(getBooksById).put(updateBook).delete(deleteBook);
+router.route("/").post(upload, createBook).get(getBooks);
+router.route("/:id").get(getBooksById).put(upload, updateBook).delete(deleteBook);
 router.route("/:id/cover").put(upload, updateBookCoverArt);
 
 export default router;

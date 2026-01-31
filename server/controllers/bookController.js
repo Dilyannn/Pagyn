@@ -13,13 +13,19 @@ const createBook = async (req, res) => {
       return res.status(400).json({ message: 'Title and Author are required' });
     }
 
-    const newBook = await Book.create({
+    const bookData = {
       userId: req.user._id,
       title,
       author,
       subtitle,
       chapters,
-    });
+    };
+
+    if (req.file) {
+      bookData.coverArt = req.file.filename;
+    }
+
+    const newBook = await Book.create(bookData);
 
     res.status(201).json(newBook);
   } catch (err) {
@@ -81,10 +87,18 @@ const updateBook = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized access' });
     }
 
+    // Create an update object from req.body
+    const updateData = { ...req.body };
+
+    // If a file was uploaded, add it to the update object
+    if (req.file) {
+      updateData.coverArt = req.file.filename;
+    }
+
     const updatedBook = await Book.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      { $set: updateData },
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedBook);
@@ -111,7 +125,7 @@ const deleteBook = async (req, res) => {
     }
 
     await book.deleteOne();
-    
+
     res.status(200).json({ message: 'Book deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', details: err.message });
@@ -125,7 +139,25 @@ const deleteBook = async (req, res) => {
  */
 const updateBookCoverArt = async (req, res) => {
   try {
+    const book = await Book.findById(req.params.id);
 
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    if (book.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized access' });
+    }
+
+    if (req.file) {
+      book.coverArt = `${req.file.path}`;
+    } else {
+      return res.status(400).json({ message: 'No cover art file uploaded' });
+    }
+
+    const updatedBook = await book.save();
+
+    res.status(200).json(updatedBook);
   } catch (err) {
     res.status(500).json({ message: 'Server error', details: err.message });
   }
