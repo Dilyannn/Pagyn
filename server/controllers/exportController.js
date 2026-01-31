@@ -46,6 +46,60 @@ const DOCX_STYLES = {
   },
 };
 
+//! Process Markdown content to DOCX paragraphs
+const processMarkdownToDocx = (markdown) => {
+  const tokens = md.parse(markdown, {});
+  const paragraphs = [];
+
+  let inList = false;
+  let listType = null; // "ordered" or "bullet"
+  let orderedCounter = 1;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+
+    try {
+      if (token.Type === "heading_open") {
+        const level = parseInt(token.tag.substring(1), 10); // 'h1' -> 1
+        const nextToken = tokens[i + 1];
+
+        if (nextToken && nextToken.type === "inline") {
+          let headingLevel;
+          let fontSize;
+
+          switch (level) {
+            case 1: 
+              headingLevel = HeadingLevel.HEADING_1;
+              fontSize = DOCX_STYLES.sizes.h1;
+              break;
+            case 2:
+              headingLevel = HeadingLevel.HEADING_2;
+              fontSize = DOCX_STYLES.sizes.h2;
+              break;
+            case 3: 
+              headingLevel = HeadingLevel.HEADING_3;
+              fontSize = DOCX_STYLES.sizes.h3;
+              break;
+            default:
+              headingLevel = HeadingLevel.HEADING_3;
+              fontSize = DOCX_STYLES.sizes.h3;    
+          }
+
+            new Paragraph({
+              text: nextToken.content,
+              heading: headingLevel,
+              spacing: {
+                before: DOCX_STYLES.spacing.headingBefore,
+                after: DOCX_STYLES.spacing.headingAfter,
+              },
+              style: {
+                font: DOCX_STYLES.fonts.heading,
+                size: fontSize * 2, // docx uses half points
+              },
+            });
+          );
+          i += 2; // Skip the inline and closing tokens
+        }
 
 
 const exportAsDocx = async (book) => {
