@@ -100,6 +100,169 @@ const processMarkdownToDocx = (markdown) => {
           );
           i += 2; // Skip the inline and closing tokens
         }
+      } else if (token.type === "bullet_list_open") {
+        inList = true;
+        listType = "bullet";
+      } else if (token.type === "bullet_list_close") {
+        inList = false;
+        listType = null;
+
+        // space after list
+        paragraphs.push(
+          new Paragraph({
+            text: "",
+            spacing: {
+              after: 100,
+            },
+          });
+        );
+      } else if (token.type === "ordered_list_open") {
+        inList = true;
+        listType = "ordered";
+        orderedCounter = 1;
+      } else if (token.type === "ordered_list_close") {
+        inList = false;
+        listType = null;
+        orderedCounter = 1;
+
+        // space after list
+        paragraphs.push(
+          new Paragraph({
+            text: "",
+            spacing: {
+              after: 100,
+            },
+          });
+        );
+      } else if (token.type === "list_item_open") {
+        const nextToken = tokens[i + 1];
+        
+        if (nextToken && nextToken.type === "paragraph_open") {
+          const inlineToken = tokens[i + 2];
+
+          if (
+            inlineToken && 
+            inlineToken.type === "inline" && 
+            inlineToken.children
+          ) {
+            const textRuns = processInlineContent(inlineToken.children);
+            let bulletText = "";
+
+            if (listType === "bullet") {
+              bulletText = "• ";
+            } else if (listType === "ordered") {
+              bulletText = `${orderedCounter}. `;
+              orderedCounter++;
+            }
+
+            paragraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: bulletText,
+                    font: DOCX_STYLES.fonts.body,
+                  }),
+                  ...textRuns,
+                ],
+                spacing: {
+                  before: 50,
+                  after: 50,
+                },
+                indent: {
+                  left: 720, // Half inch
+                },
+              });
+            );
+            i += 4 // Skip to after the closing list item token
+          }
+        } 
+      } else if (token.type === "blockquote_open") {
+        // Find the blockquote content
+        const nextToken = tokens[i + 1];
+
+        if (nextToken && nextToken.type === "paragraph_open") {
+          const inlineToken = tokens[i + 2];
+          if (inlineToken && inlineToken.type === "inline") {
+            paragraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: inlineToken.content,
+                    italics: true,
+                    color: "6A737D", // Gray color
+                    font: DOCX_STYLES.fonts.body,
+                  });
+                ],
+                spacing: {
+                  before: 200,
+                  after: 200,
+                },
+                indent: {
+                  left: 720, // Half inch
+                },
+                alignment: AlignmentType.JUSTIFIED,
+                border: {
+                  left: {
+                    color: "D1D5DA", // Light gray
+                    space: 1,
+                    style: "single",
+                    size: 24,
+                  },
+                },
+              });
+            );
+            i += 4; // Skip to after the closing blockquote token
+          }
+        }
+      } else if (token.type === "code_block" || token.type === "fence") {
+        paragraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: token.content,
+                font: "Courier New",
+                size: 20,
+                color: "333333", // Dark gray
+              }),
+            ],
+            spacing: {
+              before: 200,
+              after: 200,
+            },
+            shading: {
+              fill: "F5F5F5", // Light gray background
+            },
+          });
+        );
+      } else if (token.type === "hr") {
+        paragraphs.push(
+          new Paragraph({
+            text: "",
+            border: {
+              bottom: {
+                color: "CCCCCC", // Light gray
+                space: 1,
+                style: "single",
+                size: 6,
+              },
+            },
+            spacing: {
+              before: 200,
+              after: 200
+            },
+          });
+        );
+      } 
+    } catch (tokenErr) {
+      console.error("Error processing markdown token:", token, tokenErr);
+      continue;
+    }
+  }
+
+  return paragraphs;
+};
+
+//! Process inline content (bold, italics, text, links, etc.) to DOCX TextRuns
 
 
 const exportAsDocx = async (book) => {
