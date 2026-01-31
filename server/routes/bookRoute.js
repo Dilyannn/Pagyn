@@ -1,7 +1,22 @@
 import express from "express";
+import { protect } from "../middlewares/authMiddleware.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
+import {
+  createBook,
+  getBooks,
+  getBooksById,
+  updateBook,
+  deleteBook,
+  updateBookCoverArt
+} from "../controllers/bookController.js";
 
 const router = express.Router();
 
-// Define routes here
+router.use(protect);
+
+//^ Book Routes
+router.route("/").post(createBook).get(getBooks);
+router.route("/:id").get(getBooksById).put(updateBook).delete(deleteBook);
+router.route("/:id/cover").put(upload, updateBookCoverArt);
 
 export default router;
