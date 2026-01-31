@@ -85,6 +85,7 @@ const processMarkdownToDocx = (markdown) => {
               fontSize = DOCX_STYLES.sizes.h3;    
           }
 
+          paragraphs.push(
             new Paragraph({
               text: nextToken.content,
               heading: headingLevel,
@@ -100,6 +101,27 @@ const processMarkdownToDocx = (markdown) => {
           );
           i += 2; // Skip the inline and closing tokens
         }
+      } else if (token.type === "paragraph_open") {
+        const nextToken = tokens[i + 1];
+
+        if (nextToken && nextToken.type === "inline" && nextToken.children) {
+          const textRuns = processInlineContent(nextToken.children);
+
+          if (textRuns.length > 0) {
+            paragraphs.push(
+              new Paragraph({
+                children: textRuns,
+                spacing: {
+                  before: inList ? 100 : DOCX_STYLES.spacing.paragraphBefore,
+                  after: inList ? 100 : DOCX_STYLES.spacing.paragraphAfter,
+                  line: 360, // 1.5 line spacing
+                },
+                alignment: AlignmentType.JUSTIFIED,
+              });
+            );
+          }
+          i += 2; // Skip the inline and closing tokens
+        } 
       } else if (token.type === "bullet_list_open") {
         inList = true;
         listType = "bullet";
