@@ -31,7 +31,7 @@ app.use("/uploads", express.static(path.join(import.meta.dirname, "uploads")));
 
 //& API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/book", bookRoutes);
+app.use("/api/books", bookRoutes);
 
 //! Start the server
 const PORT = process.env.PORT || 5000;
