@@ -18,6 +18,40 @@ const generateOutline = async (req, res) => {
     }
 
     const prompt = `
+      You are an expert book author and content creator. 
+      Create a detailed book outline based on the following requirements:
+      Topic: "${topic}"
+      ${description ? `Description: ${description}` : ""}
+      ${style ? `Style: ${style}` : ""}
+      ${numChapters ? `Number of chapters: ${numChapters}` : ""}.
+      
+      Response format:
+      1. Generate exactly ${numChapters || 5} chapter titles.
+      2. Each chapter title should be concise, engaging, also must be clear 
+        and following best practices and logical progression.
+      3. Each chapter description should be 2-3 sentences long, summarizing 
+        the key points to be covered in that chapter.
+      4. Make sure the chapters are built upon each other to create a 
+        cohesive flow throughout the book.
+      5. Match the tone and "${style}" writing style in your titles and descriptions,
+        if provided.
+      6. Return ONLY A VALID JSON array with no additional text, markdown or formating. 
+        Each object MUST have exactly the following keys: "title" and "description" 
+        like shown in the example.
+      
+      Example response:
+      [
+        {
+          "title": "Chapter 1: Introduction to the Topic",
+          "description": "This chapter provides an overview of the topic, its significance, and what readers can expect to learn."
+        },
+        {
+          "title": "Chapter 2: Deep Dive into Key Concepts",
+          "description": "This chapter explores the fundamental concepts in detail, providing examples and case studies to illustrate key points."
+        }
+      ]    
+
+      Generate the book outline now:
       `;
 
       const text = response.text;
