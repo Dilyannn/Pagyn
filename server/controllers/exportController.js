@@ -942,7 +942,7 @@ const exportAsPdf = async (req, res) => {
           // If image rendering failed, we DO NOT add a page, so Title becomes first page.
         }
       } else {
-         console.warn(`[PDF Export] Cover art not found. Searched:`, possiblePaths);
+        console.warn(`[PDF Export] Cover art not found. Searched:`, possiblePaths);
       }
     }
 
