@@ -566,3 +566,122 @@ const exportAsDocx = async (book) => {
   }
 };
 
+const TYPOGRAPHY = {}; 
+
+const renderInlineTokens = (doc, tokens, options = {}) => {};
+
+const renderMarkdown = (doc, markdown) => {};
+
+const exportAsPdf = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    if (book.userId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Unauthorized access to this book" });
+    }
+
+    //? Create PDF with safe settings
+    const doc = new PDFDocument({
+      margins: {top: 72, bottom: 72, left: 72, right: 72}, // 1 inch margins
+      bufferPages: true,
+      autoFirstPage: true,
+    });
+
+    //? Set headers before piping
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${book.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`
+    );
+
+    doc.pipe(res);
+
+    //? Render Cover Page if available
+    if (book.coverArt && !book.coverArt.includes("pravatar")) {
+      const coverImagePath = book.coverArt.substring(1);
+
+      try {
+        if (fs.existsSync(coverImagePath)) {
+          const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+          const pageHeight = doc.page.height - doc.page.margins.top - doc.page.margins.bottom;
+
+          doc.image(coverImagePath, doc.page.margins.left, doc.page.margins.top, {
+            fit: [pageWidth * 0.8, pageHeight * 0.8],
+            align: "center",
+            valign: "center",
+          });
+          doc.addPage();
+        }
+      } catch (imgageErr) {
+        console.error(`Error including cover image in PDF export from: ${coverImagePath}`, imgageErr);
+      }
+    }
+
+    //? Render Title Page
+    doc
+      .font(TYPOGRAPHY.font.sansBold)
+      .fontSize(TYPOGRAPHY.size.title)
+      .fillColor(TYPOGRAPHY.color.heading)
+      .text(book.title, { align: "center" });
+
+    doc.moveDown(2);
+
+    if (book.subtitle && book.subtitle.trim()) {
+      doc
+        .font(TYPOGRAPHY.font.sans)
+        .fontSize(TYPOGRAPHY.size.h2)
+        .fillColor(TYPOGRAPHY.color.text)
+        .text(book.subtitle, { align: "center" });
+      
+      doc.moveDown(1);
+    }
+
+    doc
+      .font(TYPOGRAPHY.font.sans)
+      .fontSize(TYPOGRAPHY.size.author)
+      .fillColor(TYPOGRAPHY.color.text)
+      .text(book.author, { align: "center", lineGap: 10 });
+
+    //? Process Chapters
+    if (book.chapters && book.chapters.length > 0) {
+      book.chapters.forEach((chapter, index) => {
+        try {
+          doc.addPage();
+
+          //? Chapter Title
+          doc
+            .font(TYPOGRAPHY.font.sansBold)
+            .fontSize(TYPOGRAPHY.size.chapterTitle)
+            .fillColor(TYPOGRAPHY.color.heading)
+            .text(chapter.title || `Chapter ${index + 1}`, { align: "left" });
+          
+          doc.moveDown(TYPOGRAPHY.spacing.chapterSpacing / TYPOGRAPHY.sizes.body);
+
+          //? Chapter Content
+          if (chapter.content && chapter.content.trim()) {
+            renderMarkdown(doc, chapter.content);
+          }
+        } catch (err) {
+          console.error(`Error processing chapter "${index}" for PDF export:`, err);
+        }
+      });
+    }  
+
+    //? Finalize PDF and end the stream
+    doc.end();
+  } catch (err) {
+    console.error("PDF Export Error:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        message: "Server error during PDF export", 
+        details: err.message 
+      });
+    }
+  }
+};
+
+export { exportAsDocx, exportAsPdf };
