@@ -285,8 +285,49 @@ const processMarkdownToDocx = (markdown) => {
 };
 
 //! Process inline content (bold, italics, text, links, etc.) to DOCX TextRuns
+const processInlineContent = (inlineTokens) => {
+  const textRuns = [];
+  let currentFormatting = { bold: false, italics: false };
+  let textBuffer = "";
 
+  const flushTextBuffer = () => {
+    if (textBuffer.trim()) {
+      textRuns.push(
+        new TextRun({
+          text: textBuffer,
+          bold: currentFormatting.bold,
+          italics: currentFormatting.italics,
+          font: DOCX_STYLES.fonts.body,
+          size: DOCX_STYLES.sizes.body * 2, // docx uses half points
+        });
+      );
+      textBuffer = "";
+    }
+  };
 
+  children.forEach((token) => {
+    if (token.type === "strong_open") {
+      flushTextBuffer();
+      currentFormatting.bold = true;
+    } else if (token.type === "strong_close") {
+      flushTextBuffer();
+      currentFormatting.bold = false;
+    } else if (token.type === "em_open") {
+      flushTextBuffer();
+      currentFormatting.italics = true;
+    } else if (token.type === "em_close") {
+      flushTextBuffer();
+      currentFormatting.italics = false;
+    } else if (token.type === "text") {
+      textBuffer += token.content;
+    }
+  });
+
+  flushTextBuffer();
+  return textRuns;
+};
+
+//! Export book as DOCX
 const exportAsDocx = async (book) => {
   try { 
     const book = await Book.findById(req.params.id);
@@ -524,3 +565,4 @@ const exportAsDocx = async (book) => {
     }
   }
 };
+
