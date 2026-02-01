@@ -592,7 +592,68 @@ const TYPOGRAPHY = {
   },
 }; 
 
-const renderInlineTokens = (doc, tokens, options = {}) => {};
+const renderInlineTokens = (doc, tokens, options = {}) => {
+  if (!tokens || tokens.length === 0) {
+    return;
+  }
+
+  const baseOptions = {
+    align: options.align || "justify",
+    indent: options.indent || 0,
+    lineGap: options.lineGap || 2,
+  };
+
+  let currentFont = TYPOGRAPHY.fonts.serif;
+  let textBuffer = "";
+
+  const flushTextBuffer = () => {
+    if (textBuffer) {
+      doc.font(currentFont).text(textBuffer, {
+        ...baseOptions,
+        continued: true,
+      }); // Add baseOptions if needed
+      textBuffer = "";
+    }
+  };
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+
+    if (token.type === "text") {
+      textBuffer += token.content;
+    } else if (token.type === "strong_open") {
+      flushTextBuffer();
+      currentFont = TYPOGRAPHY.fonts.serifBold;
+    } else if (token.type === "strong_close") {
+      flushTextBuffer();
+      currentFont = TYPOGRAPHY.fonts.serif;
+    } else if (token.type === "em_open") {
+      flushTextBuffer();
+      currentFont = TYPOGRAPHY.fonts.serifItalic;
+    } else if (token.type === "em_close") {
+      flushTextBuffer();
+      currentFont = TYPOGRAPHY.fonts.serif;
+    } else if (token.type === "code_inline") {
+      flushTextBuffer();
+      doc
+        .font("Courier")
+        .text(token.content, {
+          ...baseOptions,
+          continued: true,
+        });
+      doc.font(currentFont); // revert to previous font  
+    }
+  }
+
+  if (textBuffer) {
+    doc.font(currentFont).text(textBuffer, {
+      ...baseOptions,
+      continued: false,
+    });
+  } else {
+    doc.text("", { continued: false });
+  }
+};
 
 const renderMarkdown = (doc, markdown) => {};
 
