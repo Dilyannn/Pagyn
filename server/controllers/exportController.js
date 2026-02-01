@@ -566,7 +566,31 @@ const exportAsDocx = async (book) => {
   }
 };
 
-const TYPOGRAPHY = {}; 
+const TYPOGRAPHY = {
+  fonts: {
+    serif: "Times-Roman",
+    serifBold: "Times-Bold",
+    serifItalic: "Times-Italic",
+    sans: "Helvetica",
+    sansBold: "Helvetica-Bold",
+    sansOblique: "Helvetica-Oblique",
+  },
+  sizes: {
+    title: 28,
+    author: 16,
+    chapterTitle: 22,
+    h1: 18,
+    h2: 16,
+    h3: 14,
+    body: 12,
+    caption: 10,
+  },
+  spacing: {
+    text: "#333333", // Standard text color
+    heading: "#1A202C", // Darker color for headings
+    accent: "#4F46E5", // Accent color (blue)
+  },
+}; 
 
 const renderInlineTokens = (doc, tokens, options = {}) => {};
 
