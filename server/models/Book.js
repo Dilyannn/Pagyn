@@ -34,7 +34,7 @@ const bookSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  coverImage: {
+  coverArt: {
     type: String,
     default: "default-cover.png", 
   },

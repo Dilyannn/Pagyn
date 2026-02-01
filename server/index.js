@@ -30,9 +30,9 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(import.meta.dirname, "uploads")));
 
 //& API Routes
-app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/export", exportRoutes);
 
 //! Start the server
