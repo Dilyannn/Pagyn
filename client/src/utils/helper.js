@@ -5,3 +5,8 @@ export const emailValidator = (email) => {
   return null;
 };
 
+export const passwordValidator = (password) => {
+  if (!password) return "Password is required.";
+  if (password.length < 6) return "Password must be at least 6 characters long.";
+  return null;
+};
