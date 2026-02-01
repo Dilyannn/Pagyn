@@ -6,13 +6,18 @@ import {
   HeadingLevel,
   AlignmentType,
   UnderlineType,
-  ImafeRun,
+  ImageRun,
 } from "docx";
 import PDFDocument from "pdfkit";
 import MarkdownIt from "markdown-it";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
 import Book from "../models/Book.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const UPLOADS_PATH = path.join(__dirname, '../uploads');
 
 const md = new MarkdownIt();
 
@@ -59,7 +64,7 @@ const processMarkdownToDocx = (markdown) => {
     const token = tokens[i];
 
     try {
-      if (token.Type === "heading_open") {
+      if (token.type === "heading_open") {
         const level = parseInt(token.tag.substring(1), 10); // 'h1' -> 1
         const nextToken = tokens[i + 1];
 
@@ -97,7 +102,7 @@ const processMarkdownToDocx = (markdown) => {
                 font: DOCX_STYLES.fonts.heading,
                 size: fontSize * 2, // docx uses half points
               },
-            });
+            })
           );
           i += 2; // Skip the inline and closing tokens
         }
@@ -117,7 +122,7 @@ const processMarkdownToDocx = (markdown) => {
                   line: 360, // 1.5 line spacing
                 },
                 alignment: AlignmentType.JUSTIFIED,
-              });
+              })
             );
           }
           i += 2; // Skip the inline and closing tokens
@@ -136,7 +141,7 @@ const processMarkdownToDocx = (markdown) => {
             spacing: {
               after: 100,
             },
-          });
+          })
         );
       } else if (token.type === "ordered_list_open") {
         inList = true;
@@ -154,7 +159,7 @@ const processMarkdownToDocx = (markdown) => {
             spacing: {
               after: 100,
             },
-          });
+          })
         );
       } else if (token.type === "list_item_open") {
         const nextToken = tokens[i + 1];
@@ -182,7 +187,7 @@ const processMarkdownToDocx = (markdown) => {
                 children: [
                   new TextRun({
                     text: bulletText,
-                    font: DOCX_STYLES.fonts.body,
+                    font: DOCX_STYLES.fonts.body.normal,
                   }),
                   ...textRuns,
                 ],
@@ -193,7 +198,7 @@ const processMarkdownToDocx = (markdown) => {
                 indent: {
                   left: 720, // Half inch
                 },
-              });
+              })
             );
             i += 4 // Skip to after the closing list item token
           }
@@ -212,8 +217,8 @@ const processMarkdownToDocx = (markdown) => {
                     text: inlineToken.content,
                     italics: true,
                     color: "6A737D", // Gray color
-                    font: DOCX_STYLES.fonts.body,
-                  });
+                    font: DOCX_STYLES.fonts.body.normal,
+                  })
                 ],
                 spacing: {
                   before: 200,
@@ -231,7 +236,7 @@ const processMarkdownToDocx = (markdown) => {
                     size: 24,
                   },
                 },
-              });
+              })
             );
             i += 4; // Skip to after the closing blockquote token
           }
@@ -254,7 +259,7 @@ const processMarkdownToDocx = (markdown) => {
             shading: {
               fill: "F5F5F5", // Light gray background
             },
-          });
+          })
         );
       } else if (token.type === "hr") {
         paragraphs.push(
@@ -272,7 +277,7 @@ const processMarkdownToDocx = (markdown) => {
               before: 200,
               after: 200
             },
-          });
+          })
         );
       } 
     } catch (tokenErr) {
@@ -297,15 +302,15 @@ const processInlineContent = (inlineTokens) => {
           text: textBuffer,
           bold: currentFormatting.bold,
           italics: currentFormatting.italics,
-          font: DOCX_STYLES.fonts.body,
+          font: DOCX_STYLES.fonts.body.normal,
           size: DOCX_STYLES.sizes.body * 2, // docx uses half points
-        });
+        })
       );
       textBuffer = "";
     }
   };
 
-  children.forEach((token) => {
+  inlineTokens.forEach((token) => {
     if (token.type === "strong_open") {
       flushTextBuffer();
       currentFormatting.bold = true;
@@ -328,9 +333,9 @@ const processInlineContent = (inlineTokens) => {
 };
 
 //! Export book as DOCX
-const exportAsDocx = async (book) => {
+const exportAsDocx = async (req, res) => {
   try { 
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.bookId);
 
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -345,8 +350,21 @@ const exportAsDocx = async (book) => {
     //* Cover Page if available
     const coverPage = [];
 
-    if (book.coverArt && !book.coverArt.includes("pravatar") {
-      const coverImagePath = book.coverArt.substring(1);
+    if (book.coverArt && !book.coverArt.includes("pravatar")) {
+      let coverImagePath = book.coverArt;
+      
+      // Fix path resolution
+      if (coverImagePath.startsWith("/") || coverImagePath.startsWith("\\")) {
+        coverImagePath = coverImagePath.substring(1);
+      }
+      
+      // Check if it's just a filename or relative path needing "uploads/"
+      if (!fs.existsSync(coverImagePath)) {
+        const tryUploads = path.join("uploads", path.basename(coverImagePath));
+        if (fs.existsSync(tryUploads)) {
+          coverImagePath = tryUploads;
+        }
+      }
 
       try {
         if (fs.existsSync(coverImagePath)) {
@@ -359,7 +377,7 @@ const exportAsDocx = async (book) => {
               spacing: {
                 before: 1000
               },
-            });
+            })
           );
 
           //? add image (centered)
@@ -379,7 +397,7 @@ const exportAsDocx = async (book) => {
                 before: 200,
                 after: 400,
               },
-            });
+            })
           );
 
           //? BR after image
@@ -387,11 +405,11 @@ const exportAsDocx = async (book) => {
             new Paragraph({
               text: "",
               pageBreakBefore: true,
-            });
+            })
           );
         }
-      } catch (imgageErr) {
-        console.error(`Error including cover image in DOCX export from: ${coverImagePath}`, imgageErr);
+      } catch (imageErr) {
+        console.error(`Error including cover image in DOCX export from: ${coverImagePath}`, imageErr);
       }
     }  
 
@@ -417,7 +435,7 @@ const exportAsDocx = async (book) => {
           before: 2000,
           after: 400,
         },
-      });
+      })
     );
 
     //? Subtitle (if any)
@@ -436,7 +454,7 @@ const exportAsDocx = async (book) => {
           spacing: {
             after: 400,
           },
-        });
+        })
       );
     }
 
@@ -455,7 +473,7 @@ const exportAsDocx = async (book) => {
         spacing: {
           after: 200,
         },
-      });
+      })
     );
 
     //? Line (optional)
@@ -474,7 +492,7 @@ const exportAsDocx = async (book) => {
         spacing: {
           before: 400,
         },
-      });
+      })
     );
 
     sections.push(...titlePage);
@@ -488,7 +506,7 @@ const exportAsDocx = async (book) => {
             new Paragraph({
               text: "",
               pageBreakBefore: true,
-            });
+            })
           );
         }
 
@@ -508,7 +526,7 @@ const exportAsDocx = async (book) => {
               before: DOCX_STYLES.spacing.chapterBefore,
               after: DOCX_STYLES.spacing.chapterAfter,
             },
-          });
+          })
         );
 
         //? Chapter Content (Markdown to DOCX)
@@ -539,7 +557,7 @@ const exportAsDocx = async (book) => {
     });
 
     // Generate the DOCX file buffer
-    comst buffer = await Packer.toBuffer(doc);
+    const buffer = await Packer.toBuffer(doc);
 
     // send the buffer as a downloadable file (document)
     res.setHeader(
@@ -574,21 +592,33 @@ const TYPOGRAPHY = {
     sans: "Helvetica",
     sansBold: "Helvetica-Bold",
     sansOblique: "Helvetica-Oblique",
+    body: "Helvetica", // Switched to Helvetica for cleaner look
+    bodyBold: "Helvetica-Bold",
+    bodyItalic: "Helvetica-Oblique",
   },
   sizes: {
-    title: 28,
-    author: 16,
-    chapterTitle: 22,
-    h1: 18,
-    h2: 16,
-    h3: 14,
-    body: 12,
-    caption: 10,
+    title: 36, // Bigger
+    author: 20,
+    chapterTitle: 28,
+    h1: 24,
+    h2: 20,
+    h3: 18,
+    body: 16, // Bigger
+    caption: 14,
+  },
+  color: {
+    text: "#1a1a1a", // Slightly softer black
+    heading: "#111111", 
+    accent: "#4F46E5",
   },
   spacing: {
-    text: "#333333", // Standard text color
-    heading: "#1A202C", // Darker color for headings
-    accent: "#4F46E5", // Accent color (blue)
+    headingSpacing: {
+      before: 20,
+      after: 10,
+    },
+    paragraphSpacing: 10, // Reduced from implicit large gap logic? 10/14 = 0.7 lines.
+    listSpacing: 5,
+    chapterSpacing: 30,
   },
 }; 
 
@@ -600,10 +630,10 @@ const renderInlineTokens = (doc, tokens, options = {}) => {
   const baseOptions = {
     align: options.align || "justify",
     indent: options.indent || 0,
-    lineGap: options.lineGap || 2,
+    lineGap: options.lineGap || 1, // Reduced line gap
   };
 
-  let currentFont = TYPOGRAPHY.fonts.serif;
+  let currentFont = TYPOGRAPHY.fonts.body; // Use body font
   let textBuffer = "";
 
   const flushTextBuffer = () => {
@@ -623,16 +653,16 @@ const renderInlineTokens = (doc, tokens, options = {}) => {
       textBuffer += token.content;
     } else if (token.type === "strong_open") {
       flushTextBuffer();
-      currentFont = TYPOGRAPHY.fonts.serifBold;
+      currentFont = TYPOGRAPHY.fonts.bodyBold;
     } else if (token.type === "strong_close") {
       flushTextBuffer();
-      currentFont = TYPOGRAPHY.fonts.serif;
+      currentFont = TYPOGRAPHY.fonts.body;
     } else if (token.type === "em_open") {
       flushTextBuffer();
-      currentFont = TYPOGRAPHY.fonts.serifItalic;
+      currentFont = TYPOGRAPHY.fonts.bodyItalic;
     } else if (token.type === "em_close") {
       flushTextBuffer();
-      currentFont = TYPOGRAPHY.fonts.serif;
+      currentFont = TYPOGRAPHY.fonts.body;
     } else if (token.type === "code_inline") {
       flushTextBuffer();
       doc
@@ -665,7 +695,7 @@ const renderMarkdown = (doc, markdown) => {
   let listType = null; // "ordered" or "bullet"
   let orderedCounter = 1;
 
-  for (let i = 0; i < tokens.lengtj; i++) {
+  for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
     try {
@@ -764,7 +794,7 @@ const renderMarkdown = (doc, markdown) => {
         let bullet = "";
 
         if (listType === "bullet") {
-          let bullet = "• ";
+          bullet = "• ";
         } else if (listType === "ordered") {
           bullet = `${orderedCounter}. `;
           orderedCounter++;
@@ -806,24 +836,24 @@ const renderMarkdown = (doc, markdown) => {
             align: "left",
           });
 
-        doc.font(TYPOGRAPHY.font.serif).fontSize(TYPOGRAPHY.sizes.body);
+        doc.font(TYPOGRAPHY.fonts.serif).fontSize(TYPOGRAPHY.sizes.body);
 
         doc.moveDown(
           TYPOGRAPHY.spacing.paragraphSpacing / TYPOGRAPHY.sizes.body // convert to lines
         );  
       } else if (token.type === "hr") {
         doc.moveDown();
-        cont y = doc.y;
+        const y = doc.y;
 
         doc
-          .moveTo(doc.page.margins.left, y);
+          .moveTo(doc.page.margins.left, y)
           .lineTo(doc.page.width - doc.page.margins.right, y)
           .stroke();
 
         doc.moveDown();  
       }
     } catch (tokenErr) {
-      console.error("Error processing token:", token.type, tokenError);
+      console.error("Error processing token:", token.type, tokenErr);
       continue;
     }
   }
@@ -831,7 +861,7 @@ const renderMarkdown = (doc, markdown) => {
 
 const exportAsPdf = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.bookId);
 
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -859,29 +889,67 @@ const exportAsPdf = async (req, res) => {
 
     //? Render Cover Page if available
     if (book.coverArt && !book.coverArt.includes("pravatar")) {
-      const coverImagePath = book.coverArt.substring(1);
+      const filename = path.basename(book.coverArt).trim();
+      
+      // Calculate definitive server/uploads path
+      // __dirname is .../server/controllers
+      const uploadsDir = path.join(__dirname, '../uploads');
+      
+      const possiblePaths = [
+        path.join(uploadsDir, filename), // Primary: server/uploads
+        path.join(process.cwd(), 'uploads', filename), // Fallback: CWD/uploads
+        path.join(process.cwd(), 'server', 'uploads', filename) // Fallback: CWD/server/uploads
+      ];
+      
+      if (path.isAbsolute(book.coverArt)) {
+          possiblePaths.unshift(book.coverArt);
+      }
 
-      try {
-        if (fs.existsSync(coverImagePath)) {
+      let imageBuffer = null;
+      let usedPath = "";
+
+      // Find the file
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            try {
+                imageBuffer = fs.readFileSync(p);
+                if (imageBuffer && imageBuffer.length > 0) {
+                    usedPath = p;
+                    break;
+                }
+            } catch (readErr) {
+                console.error(`[PDF Export] Error reading ${p}:`, readErr);
+            }
+        }
+      }
+
+      if (imageBuffer) {
+        try {
           const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
           const pageHeight = doc.page.height - doc.page.margins.top - doc.page.margins.bottom;
 
-          doc.image(coverImagePath, doc.page.margins.left, doc.page.margins.top, {
-            fit: [pageWidth * 0.8, pageHeight * 0.8],
+          // Render image centered
+          doc.image(imageBuffer, doc.page.margins.left, doc.page.margins.top, {
+            fit: [pageWidth, pageHeight * 0.9], // Slightly limit height to prevent overflow
             align: "center",
             valign: "center",
           });
-          doc.addPage();
+          
+          console.log(`[PDF Export] Added cover art from ${usedPath}`);
+          doc.addPage(); // Start new page for Title
+        } catch (imageErr) {
+          console.error(`[PDF Export] Error rendering cover image from ${usedPath}:`, imageErr);
+          // If image rendering failed, we DO NOT add a page, so Title becomes first page.
         }
-      } catch (imgageErr) {
-        console.error(`Error including cover image in PDF export from: ${coverImagePath}`, imgageErr);
+      } else {
+         console.warn(`[PDF Export] Cover art not found. Searched:`, possiblePaths);
       }
     }
 
     //? Render Title Page
     doc
-      .font(TYPOGRAPHY.font.sansBold)
-      .fontSize(TYPOGRAPHY.size.title)
+      .font(TYPOGRAPHY.fonts.sansBold)
+      .fontSize(TYPOGRAPHY.sizes.title)
       .fillColor(TYPOGRAPHY.color.heading)
       .text(book.title, { align: "center" });
 
@@ -889,8 +957,8 @@ const exportAsPdf = async (req, res) => {
 
     if (book.subtitle && book.subtitle.trim()) {
       doc
-        .font(TYPOGRAPHY.font.sans)
-        .fontSize(TYPOGRAPHY.size.h2)
+        .font(TYPOGRAPHY.fonts.sans)
+        .fontSize(TYPOGRAPHY.sizes.h2)
         .fillColor(TYPOGRAPHY.color.text)
         .text(book.subtitle, { align: "center" });
       
@@ -898,8 +966,8 @@ const exportAsPdf = async (req, res) => {
     }
 
     doc
-      .font(TYPOGRAPHY.font.sans)
-      .fontSize(TYPOGRAPHY.size.author)
+      .font(TYPOGRAPHY.fonts.sans)
+      .fontSize(TYPOGRAPHY.sizes.author)
       .fillColor(TYPOGRAPHY.color.text)
       .text(book.author, { align: "center", lineGap: 10 });
 
@@ -911,8 +979,8 @@ const exportAsPdf = async (req, res) => {
 
           //? Chapter Title
           doc
-            .font(TYPOGRAPHY.font.sansBold)
-            .fontSize(TYPOGRAPHY.size.chapterTitle)
+            .font(TYPOGRAPHY.fonts.sansBold)
+            .fontSize(TYPOGRAPHY.sizes.chapterTitle)
             .fillColor(TYPOGRAPHY.color.heading)
             .text(chapter.title || `Chapter ${index + 1}`, { align: "left" });
           

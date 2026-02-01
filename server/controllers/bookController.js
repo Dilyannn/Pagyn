@@ -152,7 +152,7 @@ const updateBookCoverArt = async (req, res) => {
     }
 
     if (req.file) {
-      book.coverArt = `${req.file.path}`;
+      book.coverArt = req.file.filename;
     } else {
       return res.status(400).json({ message: "No cover art file uploaded" });
     }
