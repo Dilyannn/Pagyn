@@ -90,6 +90,69 @@ function Navbar() {
         </div>
       </div>
 
+      {/* Mobile menu */}      
+      {isOpen && (
+        <div className="lg:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-400">
+          <nav className="px-4 pt-4 space-y-1">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className="block px-4 py-2 text-2sm font-medium text-gray-700 hover:text-violet-600 rounded-lg hover:bg-violet-50/50 transition-all duration-200"
+              >
+                {link.name}
+              </a>
+            ))}
+          </nav>
+            
+          <div className="px-4 pt-4 border-t border-gray-100">
+            {isAuthenticated ? (
+              <div className="space-y-4 pb-4 px-2">
+                <div className="flex items-center space-x-3 p-2 bg-gray-50 rounded-xl">
+                  <div className="h-10 w-10 bg-linear-to-br from-violet-400 to-violet-500 rounded-lg flex items-center justify-center shrink-0">
+                    <span className="text-white font-bold text-lg">
+                      {user?.username?.charAt(0).toUpperCase() || "U"}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-gray-900 truncate">
+                      {user?.username || "User"}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {user?.email}
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200"
+                  onClick={() => logout()}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-4">
+                <a
+                  href="/login"
+                  className="block w-full text-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                >
+                  Log In
+                </a>
+
+                <a
+                  href="/register"
+                  className="block w-full text-center px-4 py-2.5 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg shadow-lg shadow-violet-500/20 transition-all duration-200"
+                >
+                  Get Started
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}      
+    </header>
   );
 }
 
