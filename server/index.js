@@ -26,6 +26,23 @@ connectDB();
 //~ JSON parser middleware
 app.use(express.json());
 
+//~ Request Logger Middleware
+app.use((req, res, next) => {
+  console.log(`[API Request] ${req.method} ${req.url}`);
+
+  if (req.body && Object.keys(req.body).length > 0) {
+    const sanitizedBody = { ...req.body };
+    if (sanitizedBody.password) sanitizedBody.password = "*****"; // Hide password
+    console.log("   Data:", JSON.stringify(sanitizedBody));
+  }
+
+  if (Object.keys(req.query).length > 0) {
+    console.log("   Query:", JSON.stringify(req.query));
+  }
+
+  next();
+});
+
 //^ Folder for static files
 app.use("/uploads", express.static(path.join(import.meta.dirname, "uploads")));
 
