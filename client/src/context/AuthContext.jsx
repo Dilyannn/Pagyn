@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const AuthContext = createContext();
 
@@ -18,35 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const userString = localStorage.getItem("user");
-
-        if (token && userString) {
-          const userData = JSON.parse(userString);
-          setUser(userData);
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error("Auth Check Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuthStatus();
-  }, []);
-
-  const login = (userData, token) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -54,6 +26,36 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     window.location.href = "/"; // Redirect to home or login page
+  }, []);
+
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userString = localStorage.getItem("user");
+
+      if (token && userString) {
+        const userData = JSON.parse(userString);
+        setUser(userData);
+        setIsAuthenticated(true);
+      }
+    } catch (err) {
+      console.error("Auth Check Error:", err);
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  const login = (userData, token) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    setUser(userData);
+    setIsAuthenticated(true);
   };
 
   const updateUser = (updatedUserData) => {
@@ -72,7 +74,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     login,
     logout,
-    updateUser
+    updateUser,
+    checkAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
