@@ -27,7 +27,7 @@ function Navbar() {
   }, [pfDropdownOpen]);
 
   return (
-    <header>
+    <header className="bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2.5 group">
@@ -69,12 +69,12 @@ function Navbar() {
               <>
                 <Link 
                   to="/login" 
-                  className="px-4 py-2 text-2sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-all duration-200">
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="px-5 py-2 text-2sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg shadow-lg shadow-violet-500/60 hover:shadow-violet-600/40 transition-all duration-200">
+                  className="px-5 py-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 hover:shadow-violet-600/30 transition-all duration-200">
                   Get Started
                 </Link>
               </>
