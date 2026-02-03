@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { FEATURES } from '../../utils/data'
 
 function FeaturesSection() {
@@ -44,12 +45,12 @@ function FeaturesSection() {
 
         <div className="mt-16 text-center">
           <p className="text-lg font-medium text-gray-700 mb-6">Ready to get started?</p>
-          <a href="/register" className="inline-flex items-center px-8 py-4 text-white font-bold bg-violet-600 rounded-xl hover:bg-violet-700 shadow-xl shadow-violet-200 transition-all duration-200 transform hover:-translate-y-0.5">
+          <Link to="/login" className="inline-flex items-center px-8 py-4 text-white font-bold bg-violet-600 rounded-xl hover:bg-violet-700 shadow-xl shadow-violet-200 transition-all duration-200 transform hover:-translate-y-0.5">
             Start Creating Today
             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
