@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import ProfileDropdown from "./ProfileDropdown.jsx";
@@ -8,23 +8,11 @@ import { Menu, X, BookOpen, LogOut } from "lucide-react";
 function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [pfDropdownOpen, setPfDropdownOpen] = useState(false);
 
   const navLinks = [
     { name: "Features", href: "#features" },
     { name: "Testimonials", href: "#testimonials" },
   ];
-
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (pfDropdownOpen) {
-        setPfDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [pfDropdownOpen]);
 
   return (
     <header className="bg-white">
@@ -54,16 +42,8 @@ function Navbar() {
             {/*Auth btn & pf */}
             {isAuthenticated ? (
               <ProfileDropdown
-                isOpen={pfDropdownOpen}
-                onToggle={(e) => {
-                  e.stopPropagation(); // Prevent event bubbling
-                  setPfDropdownOpen(!pfDropdownOpen);
-                }}
-                avatar={user?.avatar || ""}
-                companyName={user?.username || "User"}
-                email={user?.email || ""}
-                userRole={user?.role || ""}
-                onLogout={() => console.log("Logout")}
+                username={user?.username || "User"}
+                onLogout={logout}
               />
             ) : (
               <>

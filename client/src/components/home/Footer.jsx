@@ -69,7 +69,7 @@ function Footer() {
           </p>
           <div className="flex items-center text-sm text-gray-500">
             <span>Made with</span>
-            <Heart className="w-4 h-4 mx-1 text-red-500 fill-current" />
+            <Heart className="w-4 h-4 mx-1 text-purple-700 fill-current" />
             <span>for creators</span>
           </div>
         </div>
