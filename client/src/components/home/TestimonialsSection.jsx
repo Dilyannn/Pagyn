@@ -4,9 +4,8 @@ import { TESTIMONIALS } from '../../utils/data'
 function TestimonialsSection() {
   return (
     <div id="testimonials" className="relative py-24 bg-linear-to-b from-white to-gray-50 overflow-hidden">
-      {/* Decorative Blobs */}
-      <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 bg-violet-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+      {/* Decorative center blob */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-purple-100 rounded-full blur-[100px] opacity-60 pointer-events-none"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto mb-20">
