@@ -65,7 +65,10 @@ function HeroSection() {
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl mix-blend-multiply"></div>
             <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl mix-blend-multiply"></div>
 
-            <div className="relative rounded-3xl bg-gray-50/50 border border-gray-200 p-2 lg:p-4 backdrop-blur-xl transform rotate-y-6 hover:rotate-y-0 transition-transform duration-700 ease-out shadow-2xl shadow-gray-200/50">
+            {/* Floating Semi-Transparent Corner Elements */}
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-purple-100/60 rounded-2xl border border-purple-200/50 backdrop-blur-sm shadow-sm animate-bounce-slow"></div>
+            <div className="absolute -bottom-6 -right-6 w-28 h-28 bg-violet-100/60 rounded-full border border-violet-200/50 backdrop-blur-sm shadow-sm animate-bounce-slow animation-delay-2000"></div>
+            <div className="relative z-10 rounded-3xl bg-gray-50/50 border border-gray-200 p-2 lg:p-4 backdrop-blur-xl transform rotate-y-6 hover:rotate-y-0 transition-transform duration-700 ease-out shadow-2xl shadow-gray-200/50">
                 <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200/50 bg-white relative">
                   
                   {/* Mock Browser Header */}
