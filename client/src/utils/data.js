@@ -34,7 +34,7 @@ export const FEATURES = [
 export const TESTIMONIALS = [
 	{
 		quote:
-			"Pagyn has completely transformed my writing process. The AI suggestions are uncannily accurate and help me breakthrough writer's block instantly.",
+			"Pagyn has completely transformed my writing process. The AI suggestions are so accurate and help me overcome my block instantly.",
 		author: "Sarah J. Mitchell",
 		title: "Fantasy Author",
 		avatar: "https://randomuser.me/api/portraits/women/44.jpg",
