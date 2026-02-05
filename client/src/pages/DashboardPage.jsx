@@ -23,9 +23,14 @@ function DashboardPage() {
       try {
         setIsLoading(true);
         const response = await axiosInstance.get(API_ENDPOINTS.BOOKS.GET_BOOKS);
-        setBooks(response.data);
+        setBooks(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        toast.error("Failed to fetch books. Please try again.");
+        // Only show toast if it's a genuine server/connection error, not a "not found" or similar status
+        if (err.response && err.response.status !== 404) {
+          toast.error("Failed to fetch books. Please try again.");
+        } else if (!err.response) {
+          toast.error("Network error. Please check your connection.");
+        }
       } finally {
         setIsLoading(false);
       }
