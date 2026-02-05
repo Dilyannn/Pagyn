@@ -24,7 +24,7 @@ function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER, formData);
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REGISTER, formData);
       login(response.data.user, response.data.token);
       toast.success("Account created successfully!");
       navigate("/dashboard");
@@ -114,7 +114,7 @@ function RegisterPage() {
             <Button 
               type="submit" 
               isLoading={isLoading} 
-              className="w-full py-4 text-lg"
+              className="w-full py-4 text-lg cursor-pointer"
               variant="primary"
             >
               Get Started
@@ -124,7 +124,7 @@ function RegisterPage() {
           <div className="mt-8 pt-8 border-t border-gray-100">
             <p className="text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link to="/login" className="text-violet-600 hover:text-violet-700 font-bold decoration-2 underline-offset-4 hover:underline transition-all">
+              <Link to="/login" className="text-violet-600 hover:text-violet-700 font-bold decoration-2 underline-offset-4 transition-all">
                 Sign In
               </Link>
             </p>

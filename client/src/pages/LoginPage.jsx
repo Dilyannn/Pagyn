@@ -24,8 +24,17 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, formData);
-      login(response.data.user, response.data.token);
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, formData);
+      const { token } = response.data;
+      
+      // Fetch user profile after login
+      const profileResponse = await axiosInstance.get(API_ENDPOINTS.AUTH.GET_PROFILE, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      login(profileResponse.data, token);
       toast.success("Welcome back!");
       navigate("/dashboard");
     } catch (err) {
@@ -101,14 +110,14 @@ function LoginPage() {
             <Button 
               type="submit" 
               isLoading={isLoading} 
-              className="w-full py-4 text-lg"
+              className="w-full py-4 text-lg cursor-pointer"
               variant="primary"
             >
               Sign In
             </Button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 italic">
+          <div className="mt-8 pt-8 border-t border-gray-100">
             <p className="text-center text-sm text-gray-600">
               New to Pagyn?{" "}
               <Link to="/register" className="text-violet-600 hover:text-violet-700 font-bold decoration-2 underline-offset-4 transition-all">
