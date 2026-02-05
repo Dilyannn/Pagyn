@@ -7,7 +7,7 @@ import DashboardMainLayout from "../components/layout/DashboardMainLayout";
 import Button from "../components/ui/Button";
 import BookCard from "../components/cards/BookCard.jsx";
 import CreateBookModal from "../components/modals/CreateBookModal";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
 import { API_ENDPOINTS } from "../utils/api";
 
@@ -16,7 +16,7 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

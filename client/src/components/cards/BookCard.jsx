@@ -1,105 +1,61 @@
 import { useNavigate } from "react-router-dom"
 import { BASE_URL } from "../../utils/api"
-import { Edit2, Trash2 } from "lucide-react"
+import { Edit, Trash2 } from "lucide-react"
 
 function BookCard({ book, onDelete }) {
   const navigate = useNavigate();
-  let coverArtUrl = null;
 
-  if (book.coverArt && book.coverArt !== "default-cover.png") {
-    if (book.coverArt.startsWith("http")) {
-      coverArtUrl = book.coverArt;
-    } else {
-      coverArtUrl = `${BASE_URL}/uploads/${book.coverArt}`;
-    }
-  }
-
-  const fallbackGradient = "bg-linear-to-b from-amber-300 via-orange-400 to-orange-500";
-
-  const handleEdit = (e) => {
-    e.stopPropagation();
-    navigate(`/editor/${book._id}/edit`);
-  };
-
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    if(onDelete) onDelete(book._id);
-  };
-
-  const handleCardClick = () => {
-    navigate(`/view-book/${book._id}`);
-  };
+  const coverArtUrl = book.coverArt && book.coverArt !== "default-cover.png"
+    ? (book.coverArt.startsWith('http') ? book.coverArt : `${BASE_URL}/books/${book._id}/cover`)
+    : (book.coverImage && book.coverImage.startsWith('http') ? book.coverImage : "");
 
   return (
     <div 
-      onClick={handleCardClick}
-      className={`relative group aspect-2/3 w-full rounded-4xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 hover:-translate-y-2 ${!coverArtUrl ? fallbackGradient : 'bg-gray-100'}`}
+        onClick={() => navigate(`/view-book/${book._id}`)} 
+        // Fixed typo 'raelative' -> 'relative' from BookCard2 sample
+        className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-100/50 cursor-pointer hover:-translate-y-1 block h-full w-full"
     >
-      {/* Background Image / Illustration */}
-      {coverArtUrl && (
+      <div className="relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 w-full aspect-16/25">
         <img 
-          src={coverArtUrl} 
-          alt={book.title} 
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          onError={(e) => { e.target.style.display = 'none'; }}
+          src={coverArtUrl}
+          alt={book.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => { e.target.style.display = "none" }}
         />
-      )}
 
-      {/* Gradient Overlay: Darker at bottom for text readability, subtle at top */}
-      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-70 transition-opacity duration-300"></div>
-      
-      {/* Extra top gradient for the author text visibility */}
-      <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-      {/* Action Buttons - Top Right (Visible on Hover) */}
-      <div className="absolute top-4 right-4 flex space-x-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-30">
-        <button 
-          onClick={handleEdit}
-          className="p-3 bg-white hover:bg-gray-50 text-gray-700 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          title="Edit Book"
-        >
-          <Edit2 className="w-5 h-5 text-gray-700" />
-        </button>
-        <button 
-          onClick={handleDelete}
-          className="p-3 bg-white hover:bg-red-50 text-red-500 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          title="Delete Book"
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Content Layer */}
-      <div className="absolute inset-0 flex flex-col justify-between p-6 z-20">
-        
-        {/* Top: Subtitle or Author */}
-        <div className="w-full text-center pt-2">
-          <span className="text-white/90 text-sm font-medium tracking-widest uppercase drop-shadow-md font-sans">
-            {book.subtitle || book.author || "Author"}
-          </span>
-        </div>
-        
-        {/* Middle: Title (Centered in available space) */}
-        <div className="flex-1 flex flex-col items-center justify-start mt-8">
-          <h3 className="text-3xl sm:text-4xl font-black text-white text-center leading-[1.1] drop-shadow-lg line-clamp-4 font-sans tracking-tight">
-            {book.title}
-          </h3>
-        </div>
-
-        {/* Bottom: Footer Info */}
-        <div className="pt-4 border-t border-white/10 mt-auto">
-          <p className="text-white/90 text-xs font-bold uppercase tracking-wider mb-1">
-            {book.author}
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="text-white font-medium text-sm truncate opacity-80">
-              {book.createdAt ? new Date(book.createdAt).toLocaleDateString() : ""}
-            </span>
-          </div>
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2 z-20">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/editor/${book._id}/edit`);
+            }}
+            className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors cursor-pointer"    
+          >
+            <Edit className="w-4 h-4 text-gray-700" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if(onDelete) onDelete(book._id);
+            }}
+            className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors group/delete cursor-pointer"
+          >
+            <Trash2 className="w-4 h-4 text-red-500 group-hover/delete:text-red-600" />
+          </button>
         </div>
       </div>
+
+      <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-10 pointer-events-none">
+        {/* Fixed: removed backdrop-blur-xs and fixed gradient color syntax here for clarity and to remove blur */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent"></div>
+        <div className="relative">
+          <h3 className="font-semibold text-white text-lg leading-tight line-clamp-2 mb-1 drop-shadow-md">{book.title}</h3>
+          <p className="text-sm text-gray-200 font-medium drop-shadow-md">{book.author}</p>
+        </div>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-orange-500 via-amber-500 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20" />
     </div>
-  );
+  )
 }
 
 export default BookCard;
