@@ -62,7 +62,7 @@ function DashboardPage() {
         </div>
         <Button 
           onClick={handleCreateBookClick} 
-          className="inline-flex items-center px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-violet-600/30 transition-all duration-300 transform hover:-translate-y-0.5"
+          className="inline-flex items-center px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-violet-600/30 transition-all duration-300 transform cursor-pointer"
         >
           <Plus className="w-5 h-5 mr-2" />
           Create New eBook
@@ -95,7 +95,7 @@ function DashboardPage() {
             <Button 
               onClick={handleCreateBookClick}
               variant="primary"
-              className="px-8 py-4 rounded-2xl text-lg flex items-center"
+              className="px-8 py-4 rounded-2xl text-lg flex items-center cursor-pointer"
             >
               <Plus className="w-5 h-5 mr-2" />
               Create Your First eBook
