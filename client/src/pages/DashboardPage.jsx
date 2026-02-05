@@ -7,6 +7,7 @@ import DashboardMainLayout from "../components/layout/DashboardMainLayout";
 import Button from "../components/ui/Button";
 import BookCard from "../components/cards/BookCard.jsx";
 import CreateBookModal from "../components/modals/CreateBookModal";
+import DeleteBookModal from "../components/modals/DeleteBookModal";
 // import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
 import { API_ENDPOINTS } from "../utils/api";
@@ -15,7 +16,9 @@ function DashboardPage() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   // const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -39,8 +42,26 @@ function DashboardPage() {
     fetchBooks();
   }, []);
 
-  const handleDeleteBook = async () => {
+  const handleDeleteRequest = (book) => {
+    setBookToDelete(book);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (!bookToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await axiosInstance.delete(`${API_ENDPOINTS.BOOKS.DELETE_BOOK}/${bookToDelete}`);
+      setBooks(books.filter(b => b._id !== bookToDelete));
+      toast.success("eBook deleted successfully");
+      setIsDeleteModalOpen(false);
+      setBookToDelete(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete eBook");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleCreateBookClick = () => {
@@ -81,7 +102,7 @@ function DashboardPage() {
               <BookCard 
                 key={book._id} 
                 book={book} 
-                onDelete={handleDeleteBook} 
+                onDelete={handleDeleteRequest} 
               />
             ))}
           </div>
@@ -102,6 +123,30 @@ function DashboardPage() {
               <Plus className="w-5 h-5 mr-2" />
               Create Your First eBook
             </Button>
+            
+            <button
+                onClick={() => setBooks([
+                  {
+                    _id: "preview_1",
+                    title: "30 DAY PRODUCTIVITY",
+                    author: "Alex Clark",
+                    subtitle: "Alex Thomas", 
+                    createdAt: new Date().toISOString(),
+                    coverArt: "", 
+                  },
+                  {
+                    _id: "preview_2", 
+                    title: "The Future of AI Art",
+                    author: "Sarah Connor",
+                    subtitle: "Tech Weekly",
+                    createdAt: new Date().toISOString(),
+                    coverArt: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1000",
+                  }
+                ])}
+                className="mt-6 text-violet-600 hover:text-violet-700 font-medium text-sm hover:underline cursor-pointer"
+            >
+              Preview Sample Cards
+            </button>
           </div>
         )}
       </div>
@@ -110,6 +155,14 @@ function DashboardPage() {
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
         onSuccess={handleCreateBook}
+      />
+
+      <DeleteBookModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        bookTitle={bookToDelete?.title}
+        isLoading={isDeleting}
       />
     </DashboardMainLayout>
   )

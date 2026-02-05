@@ -36,7 +36,7 @@ function BookCard({ book, onDelete }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if(onDelete) onDelete(book._id);
+              if(onDelete) onDelete(book);
             }}
             className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors group/delete cursor-pointer"
           >
