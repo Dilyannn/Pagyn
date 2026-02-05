@@ -5,6 +5,7 @@ import { Plus, Book, BookOpen } from "lucide-react";
 
 import DashboardMainLayout from "../components/layout/DashboardMainLayout";
 import Button from "../components/ui/Button";
+import BookCard from "../components/cards/BookCard.jsx";
 import CreateBookModal from "../components/modals/CreateBookModal";
 import { useAuth } from "../context/AuthContext";
 import axiosInstance from "../utils/axiosInstance";
@@ -75,12 +76,13 @@ function DashboardPage() {
             <div className="w-12 h-12 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
           </div>
         ) : books.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Books will go here */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {books.map((book) => (
-              <div key={book._id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                {book.title}
-              </div>
+              <BookCard 
+                key={book._id} 
+                book={book} 
+                onDelete={handleDeleteBook} 
+              />
             ))}
           </div>
         ) : (
