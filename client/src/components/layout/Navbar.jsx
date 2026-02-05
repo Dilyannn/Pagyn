@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 
 import { Menu, X, BookOpen, LogOut } from "lucide-react";
 
-function Navbar() {
+function Navbar({ showLinks = true }) {
   const { user, logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
     { name: "Features", href: "#features" },
@@ -15,28 +24,36 @@ function Navbar() {
   ];
 
   return (
-    <header className="bg-white">
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${
+      showLinks 
+        ? isScrolled 
+          ? "bg-white/80 backdrop-blur-lg border-b border-gray-100/50 shadow-sm"
+          : "bg-white border-b border-gray-100" 
+        : "bg-white/5 backdrop-blur-md"
+    }`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2.5 group">
-            <div className="w-9 h-9 bg-linear-to-br from-violet-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:from-violet-500 group-hover:to-purple-600 transition-all duration-300 group-hover:scale-105">
+            <div className="w-9 h-9 bg-linear-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-all duration-300">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900 tracking-tight">
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-gray-900 to-gray-600 tracking-tight">
               Pagyn
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
-                className="px-4 py-2 text-2sm font-medium text-gray-700 hover:text-violet-600 rounded-lg hover:bg-violet-50/50 transition-all duration-200">
-                {link.name}
-              </a>
-            ))}
-          </nav>
+          {showLinks && (
+            <nav className="hidden lg:flex items-center space-x-1">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name} 
+                  href={link.href} 
+                  className="px-4 py-2 text-2sm font-medium text-gray-700 hover:text-violet-600 rounded-lg hover:bg-violet-50/50 transition-all duration-200">
+                  {link.name}
+                </a>
+              ))}
+            </nav>
+          )}
 
           <div className="hidden lg:flex items-center space-x-3">
             {/*Auth btn & pf */}
@@ -72,7 +89,7 @@ function Navbar() {
       </div>
 
       {/* Mobile menu */}      
-      {isOpen && (
+      {showLinks && isOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-400">
           <nav className="px-4 pt-4 space-y-1">
             {navLinks.map((link) => (
