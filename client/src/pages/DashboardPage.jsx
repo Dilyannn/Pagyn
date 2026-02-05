@@ -52,8 +52,8 @@ function DashboardPage() {
     
     setIsDeleting(true);
     try {
-      await axiosInstance.delete(`${API_ENDPOINTS.BOOKS.DELETE_BOOK}/${bookToDelete}`);
-      setBooks(books.filter(b => b._id !== bookToDelete));
+      await axiosInstance.delete(API_ENDPOINTS.BOOKS.DELETE_BOOK(bookToDelete._id));
+      setBooks(books.filter(b => b._id !== bookToDelete._id));
       toast.success("eBook deleted successfully");
       setIsDeleteModalOpen(false);
       setBookToDelete(null);
@@ -123,30 +123,6 @@ function DashboardPage() {
               <Plus className="w-5 h-5 mr-2" />
               Create Your First eBook
             </Button>
-            
-            <button
-                onClick={() => setBooks([
-                  {
-                    _id: "preview_1",
-                    title: "30 DAY PRODUCTIVITY",
-                    author: "Alex Clark",
-                    subtitle: "Alex Thomas", 
-                    createdAt: new Date().toISOString(),
-                    coverArt: "", 
-                  },
-                  {
-                    _id: "preview_2", 
-                    title: "The Future of AI Art",
-                    author: "Sarah Connor",
-                    subtitle: "Tech Weekly",
-                    createdAt: new Date().toISOString(),
-                    coverArt: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1000",
-                  }
-                ])}
-                className="mt-6 text-violet-600 hover:text-violet-700 font-medium text-sm hover:underline cursor-pointer"
-            >
-              Preview Sample Cards
-            </button>
           </div>
         )}
       </div>
