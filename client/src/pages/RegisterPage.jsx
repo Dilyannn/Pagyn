@@ -10,7 +10,12 @@ import axiosInstance from "../utils/axiosInstance.js";
 import { API_ENDPOINTS } from "../utils/api.js";
 
 function RegisterPage() {
-  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ 
+    username: "", 
+    email: "", 
+    password: "",
+    repeatPassword: "" 
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,11 +26,26 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.repeatPassword) {
+      return toast.error("Passwords do not match!");
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REGISTER, formData);
-      login(response.data.user, response.data.token);
+      const { username, email, password } = formData;
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REGISTER, { username, email, password });
+      const { token } = response.data;
+      
+      // Fetch user profile after registration
+      const profileResponse = await axiosInstance.get(API_ENDPOINTS.AUTH.GET_PROFILE, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      login(profileResponse.data, token);
       toast.success("Account created successfully!");
       navigate("/dashboard");
     } catch (err) {
