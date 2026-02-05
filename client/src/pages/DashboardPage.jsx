@@ -1,8 +1,110 @@
-import React from 'react'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Plus, Book, BookOpen } from "lucide-react";
+
+import DashboardMainLayout from "../components/layout/DashboardMainLayout";
+import Button from "../components/ui/Button";
+import CreateBookModal from "../components/modals/CreateBookModal";
+import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../utils/axiosInstance";
+import { API_ENDPOINTS } from "../utils/api";
 
 function DashboardPage() {
+  const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axiosInstance.get(API_ENDPOINTS.BOOKS.GET_BOOKS);
+        setBooks(response.data);
+      } catch (err) {
+        toast.error("Failed to fetch books. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBooks();
+  }, []);
+
+  const handleDeleteBook = async () => {
+    if (!bookToDelete) return;
+  };
+
+  const handleCreateBookClick = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateBook = (bookId) => {
+    setIsCreateModalOpen(false);
+    navigate(`/editor/${bookId}/edit`);
+  }
+
   return (
-    <div>DashboardPage</div>
+    <DashboardMainLayout>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <div> 
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">All eBooks</h1>
+          <p className="text-gray-500 mt-2 text-lg">
+            Create, edit, and manage all your AI-generated eBooks.
+          </p>
+        </div>
+        <Button 
+          onClick={handleCreateBookClick} 
+          className="inline-flex items-center px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl shadow-xl shadow-violet-500/20 hover:shadow-violet-600/30 transition-all duration-300 transform hover:-translate-y-0.5"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Create New eBook
+        </Button>
+      </div>
+
+      <div className="relative min-h-100">
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
+          </div>
+        ) : books.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Books will go here */}
+            {books.map((book) => (
+              <div key={book._id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                {book.title}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-8 border-2 border-dashed border-gray-200 rounded-[2.5rem] bg-gray-50/30 p-12 lg:p-20 flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+              <BookOpen className="w-10 h-10 text-violet-400 opacity-60" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">No eBooks Found</h3>
+            <p className="text-gray-500 max-w-sm mb-10 text-lg leading-relaxed">
+              You haven't created any eBooks yet. Get started by creating your first one.
+            </p>
+            <Button 
+              onClick={handleCreateBookClick}
+              variant="primary"
+              className="px-8 py-4 rounded-2xl text-lg flex items-center"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Create Your First eBook
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <CreateBookModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onSuccess={handleCreateBook}
+      />
+    </DashboardMainLayout>
   )
 }
 
