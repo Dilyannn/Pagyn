@@ -82,7 +82,64 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
       }}
       title="Create New eBook"
     >
-      Content Here
+      {step === 1 && (
+        <div className="">
+          <div className="">
+            <div className="">
+              1
+            </div>
+            <div className=""></div>
+            <div className="">
+              2
+            </div>
+          </div>
+
+          <InputField
+            icon={BookOpen}
+            label="Book Title"
+            placeholder="Enter your book title"
+            value={title} //TODO check if title or bookTitle
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          <InputField
+            icon={Hash}
+            label="Number of Chapters"
+            type="number"
+            placeholder="3"
+            value={numChapters}
+            onChange={(e) => setNumChapters(parseInt(e.target.value) || 1)}
+            min="1"
+            max="20"
+          />
+
+          <InputField
+            icon={LightBulb}
+            label="Book Topic (Optional)"
+            placeholder="e.g. Personal Finance, Mindfulness, etc."
+            value={topic} // TODO check if topic or aiTopic
+            onChange={(e) => setTopic(e.target.value)}
+            options={[
+              "Informative",
+              "Conversational",
+              "Storytelling",
+              "Casual",
+              "Professional",
+              "Humorous",
+            ]}
+          />
+
+          <div className="">
+            <Button
+              onClick={handleGenerateOutline}
+              isLoading={isGeneratingOutline}
+              icon={Sparkles}
+            >
+              Generate Outline with AI
+            </Button>
+          </div>
+        </div>
+      )}
     </Modal>
   )
 }
