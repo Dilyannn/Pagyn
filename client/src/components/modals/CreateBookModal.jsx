@@ -12,6 +12,10 @@ import {
   BookOpen,
   Hash,
   Lightbulb,
+  Check,
+  Plus,
+  ArrowLeft,
+  Trash2,
 } from "lucide-react";
 
 function CreateBookModal({ isOpen, onClose, onBookCreated }) {
@@ -22,8 +26,8 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   const [topic, setTopic] = useState("");
   const [genre, setGenre] = useState([]);
   const [chapters, setChapters] = useState([]); // AI-generated chapters
-  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false); 
-  
+  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
+
   const chaptersRef = useRef([]); //& chapter container ref for auto-scrolling
 
   const resetModal = () => {
@@ -36,7 +40,19 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
     setIsGeneratingOutline(false);
   };
 
-  const handleGenerateOutline = async () => {};
+  const handleGenerateOutline = async () => {
+    setIsGeneratingOutline(true);
+    // Simulate AI generation
+    setTimeout(() => {
+      const mockChapters = Array.from({ length: numChapters }, (_, i) => ({
+        title: `Chapter ${i + 1}: ${topic || title}`,
+        description: `Overview of chapter ${i + 1} content focused on ${topic || title}.`,
+      }));
+      setChapters(mockChapters);
+      setStep(2);
+      setIsGeneratingOutline(false);
+    }, 1500);
+  };
 
   const handleChapterChange = (index, field, value) => {
     const updatedChapters = [...chapters];
@@ -51,7 +67,16 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
     ]);
   };
 
-  const handleFinalizeBook = async () => {};
+  const handleDeleteChapter = (index) => {
+    const updatedChapters = chapters.filter((_, i) => i !== index);
+    setChapters(updatedChapters);
+  };
+
+  const handleFinalizeBook = async () => {
+    onBookCreated({ title, numChapters, topic, genre, chapters });
+    onClose();
+    resetModal();
+  };
 
   useEffect(() => {
     if (step === 2 && chaptersRef.current) {
@@ -75,11 +100,17 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
       {step === 1 && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
           <div className="flex items-center justify-center mb-10 relative px-10">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step >= 1 ? 'bg-violet-100 text-violet-700 ring-4 ring-violet-50' : 'bg-gray-100 text-gray-400'}`}>
-              1
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step === 1 ? "bg-violet-100 text-violet-700 ring-4 ring-violet-50" : "bg-violet-500 text-white ring-4 ring-violet-50"}`}
+            >
+              {step > 1 ? <Check className="w-6 h-6" /> : "1"}
             </div>
-            <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-violet-200' : 'bg-gray-100'}`}></div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step >= 2 ? 'bg-violet-100 text-violet-700 ring-4 ring-violet-50' : 'bg-gray-100 text-gray-400'}`}>
+            <div
+              className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${step >= 2 ? "bg-violet-200" : "bg-gray-100"}`}
+            ></div>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step >= 2 ? "bg-violet-100 text-violet-700 ring-4 ring-violet-50" : "bg-gray-100 text-gray-400"}`}
+            >
               2
             </div>
           </div>
@@ -89,7 +120,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               icon={BookOpen}
               label="Book Title"
               placeholder="Enter your book title"
-              value={title} 
+              value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="bg-gray-50/50"
             />
@@ -123,10 +154,11 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               onChange={(newGenres) => setGenre(newGenres)}
               multiple={true}
               options={[
+                "Adventure",
                 "Informative",
                 "Conversational",
                 "Storytelling",
-                "Fantasy Adventure",
+                "Fantasy",
                 "Sci-Fi",
                 "Mystery",
                 "Supernatural",
@@ -163,15 +195,130 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               onClick={handleGenerateOutline}
               isLoading={isGeneratingOutline}
               icon={Sparkles}
-              className="w-full bg-linear-to-r from-violet-400 to-purple-400 hover:from-violet-400 hover:to-purple-300 text-white font-bold rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-violet-400/20"
+              className="cursor-pointer w-full"
             >
               Generate with AI
             </Button>
           </div>
         </div>
       )}
+
+      {step === 2 && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2 h-full flex flex-col">
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center mb-6 relative px-10 shrink-0">
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 bg-violet-500 text-white ring-4 ring-violet-50`}
+            >
+              <Check className="w-6 h-6" />
+            </div>
+            <div
+              className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 bg-violet-200`}
+            ></div>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 bg-violet-100 text-violet-700 ring-4 ring-violet-50`}
+            >
+              2
+            </div>
+          </div>
+
+          {/* Header Info */}
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900">Review Chapters</h3>
+            <span className="text-sm text-gray-500">
+              {chapters.length} chapters
+            </span>
+          </div>
+
+          {/* Chapters List */}
+          <div
+            ref={chaptersRef}
+            className="space-y-3 max-h-96 overflow-y-auto pr-1"
+          >
+            {chapters.length === 0 ? (
+              <div className="text-center py-12 px-4 bg-gray-50 rounded-xl">
+                <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">
+                  No chapters yet. Add one to get started
+                </p>
+              </div>
+            ) : (
+              chapters.map((chapter, index) => (
+                <div
+                  key={index}
+                  className="group p-4 border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all bg-white"
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-50 text-violet-600 text-xs font-semibold shrink-0">
+                        {index + 1}
+                      </div>
+                      <input
+                        type="text"
+                        value={chapter.title}
+                        onChange={(e) =>
+                          handleChapterChange(index, "title", e.target.value)
+                        }
+                        className="flex-1 text-base font-medium text-gray-900 bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0"
+                        placeholder="Chapter Title"
+                      />
+                      <button
+                        onClick={() => handleDeleteChapter(index)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 transition-all cursor-pointer"
+                        title="Delete Chapter"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </button>
+                    </div>
+
+                    <textarea
+                      value={chapter.description}
+                      onChange={(e) =>
+                        handleChapterChange(
+                          index,
+                          "description",
+                          e.target.value,
+                        )
+                      }
+                      className="w-full pl-9 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-gray-600 placeholder-gray-400 p-0 text-sm resize-none min-h-[60px]"
+                      placeholder="Add a brief description or key points for this chapter..."
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer Actions */}
+          <div className="pt-4 border-t border-gray-100 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-2 w-full sm:w-auto">
+              <Button
+                onClick={() => setStep(1)}
+                className="w-full justify-center cursor-pointer"
+                icon={ArrowLeft}
+              >
+                Back
+              </Button>
+              <Button
+                onClick={handleChapter}
+                className="w-full justify-center cursor-pointer"
+                icon={Plus}
+              >
+                Add
+              </Button>
+            </div>
+            <Button
+              onClick={handleFinalizeBook}
+              className="w-full sm:w-auto justify-center cursor-pointer"
+              icon={Sparkles}
+            >
+              Create eBook
+            </Button>
+          </div>
+        </div>
+      )}
     </Modal>
-  )
+  );
 }
 
-export default CreateBookModal
+export default CreateBookModal;
