@@ -19,7 +19,8 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   const [title, setTitle] = useState("");
   const [numChapters, setNumChapters] = useState(3);
 
-  const [topic, setTopic] = useState([]); // for the AI outline generation
+  const [topic, setTopic] = useState("");
+  const [genre, setGenre] = useState([]);
   const [chapters, setChapters] = useState([]); // AI-generated chapters
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false); 
   
@@ -29,7 +30,8 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
     setStep(1);
     setTitle("");
     setNumChapters(3);
-    setTopic([]);
+    setTopic("");
+    setGenre([]);
     setChapters([]);
     setIsGeneratingOutline(false);
   };
@@ -104,12 +106,21 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               className="bg-gray-50/50"
             />
 
-            <SelectField
+            <InputField
               icon={Lightbulb}
-              label="Book Topic / Genres"
-              placeholder="Select topics (e.g. Finance, Sci-Fi)"
+              label="Topic (Optional)"
+              placeholder="e.g. Personal Finance, Mindfulness, etc."
               value={topic}
-              onChange={(newTopics) => setTopic(newTopics)}
+              onChange={(e) => setTopic(e.target.value)}
+              className="bg-gray-50/50"
+            />
+
+            <SelectField
+              icon={BookOpen}
+              label="Genre"
+              placeholder="Select genres"
+              value={genre}
+              onChange={(newGenres) => setGenre(newGenres)}
               multiple={true}
               options={[
                 "Informative",
