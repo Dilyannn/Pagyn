@@ -27,7 +27,7 @@ function BookCard({ book, onDelete }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/editor/${book._id}/edit`);
+              navigate(`/editor/${book._id}`);
             }}
             className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors cursor-pointer"    
           >

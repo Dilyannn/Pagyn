@@ -70,7 +70,7 @@ function DashboardPage() {
 
   const handleCreateBook = (bookId) => {
     setIsCreateModalOpen(false);
-    navigate(`/editor/${bookId}/edit`);
+    navigate(`/editor/${bookId}`);
   }
 
   return (
