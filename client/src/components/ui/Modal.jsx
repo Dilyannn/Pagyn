@@ -1,7 +1,18 @@
 import { X } from "lucide-react";
 import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 function Modal({ isOpen, onClose, title, children }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return createPortal(

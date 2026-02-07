@@ -118,10 +118,9 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               onClick={handleGenerateOutline}
               isLoading={isGeneratingOutline}
               icon={Sparkles}
-              size="lg"
-              className="w-full py-4 rounded-2xl shadow-xl shadow-violet-500/20"
+              className="w-full bg-linear-to-r from-violet-400 to-purple-400 hover:from-violet-400 hover:to-purple-300 text-white font-bold rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-violet-400/20"
             >
-              Generate Outline with AI
+              Generate with AI
             </Button>
           </div>
         </div>

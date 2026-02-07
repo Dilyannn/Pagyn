@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../ui/Button";
 
 function DeleteBookModal({ isOpen, onClose, onConfirm, bookTitle, isLoading }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
