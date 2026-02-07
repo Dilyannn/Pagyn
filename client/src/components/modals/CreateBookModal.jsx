@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from "../../utils/api.js";
 import Modal from "../ui/Modal";
 import InputField from "../ui/InputField";
 import Button from "../ui/Button";
+import SelectField from "../ui/SelectField";
 
 import {
   Sparkles,
@@ -18,7 +19,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   const [title, setTitle] = useState("");
   const [numChapters, setNumChapters] = useState(3);
 
-  const [topic, setTopic] = useState(""); // for the AI outline generation
+  const [topic, setTopic] = useState([]); // for the AI outline generation
   const [chapters, setChapters] = useState([]); // AI-generated chapters
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false); 
   
@@ -28,7 +29,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
     setStep(1);
     setTitle("");
     setNumChapters(3);
-    setTopic("");
+    setTopic([]);
     setChapters([]);
     setIsGeneratingOutline(false);
   };
@@ -103,12 +104,45 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
               className="bg-gray-50/50"
             />
 
-            <InputField
+            <SelectField
               icon={Lightbulb}
-              label="Book Topic (Optional)"
-              placeholder="e.g. Personal Finance, Mindfulness, etc."
+              label="Book Topic / Genres"
+              placeholder="Select topics (e.g. Finance, Sci-Fi)"
               value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              onChange={(newTopics) => setTopic(newTopics)}
+              multiple={true}
+              options={[
+                "Informative",
+                "Conversational",
+                "Storytelling",
+                "Fantasy Adventure",
+                "Sci-Fi",
+                "Mystery",
+                "Supernatural",
+                "Romance",
+                "Casual",
+                "Professional",
+                "Humorous",
+                "Motivational",
+                "Inspirational",
+                "Educational",
+                "Technical",
+                "Financial",
+                "Health & Wellness",
+                "Self-Help",
+                "Business",
+                "Marketing",
+                "Productivity",
+                "Creative Writing",
+                "Children's",
+                "Young Adult",
+                "Historical Fiction",
+                "Thriller",
+                "Horror",
+                "Comedy",
+                "Satire",
+                "Parody",
+              ]}
               className="bg-gray-50/50"
             />
           </div>
