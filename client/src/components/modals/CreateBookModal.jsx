@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import { API_ENDPOINTS } from "../../utils/api.js";
+import { useAuth } from "../../context/AuthContext";
 
 import Modal from "../ui/Modal";
 import InputField from "../ui/InputField";
@@ -20,6 +21,7 @@ import {
 import { toast } from "react-hot-toast";
 
 function CreateBookModal({ isOpen, onClose, onBookCreated }) {
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
   const [numChapters, setNumChapters] = useState(3);
@@ -28,6 +30,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   const [genre, setGenre] = useState([]);
   const [chapters, setChapters] = useState([]); // AI-generated chapters
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   const chaptersRef = useRef([]); //& chapter container ref for auto-scrolling
 
@@ -61,7 +64,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
         style: genre.join(", "),
         numChapters: numChapters,
       });
-      setChapters(response.data.chapters);
+      setChapters(response.data.outline || []); // Access 'outline' instead of 'chapters'
       setStep(2);
       toast.success("Outline generated successfully! You can now review and edit the chapters.");
     } catch (err) {
@@ -90,9 +93,33 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   };
 
   const handleFinalizeBook = async () => {
-    onBookCreated({ title, numChapters, topic, genre, chapters });
-    onClose();
-    resetModal();
+    if (!title || chapters.length === 0) {
+      toast.error("Please provide a title and at least one chapter");
+      return;
+    }
+
+    if (!genre || genre.length === 0) {
+      toast.error("Please select at least one genre");
+      return;
+    }
+    setIsFinalizing(true);
+
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.BOOKS.CREATE_BOOK, {
+        title: title,
+        author: user.username || "Unknown Author",
+        chapters: chapters
+      });
+      toast.success("eBook created successfully!");
+      onBookCreated(response.data.bookId);
+      onClose();
+      resetModal();
+    } catch (err) {
+      console.log("TESR_", title, chapters);
+      toast.error(err.response?.data?.message || "Failed to create eBook. Please try again.");
+    } finally {
+      setIsFinalizing(false);
+    }
   };
 
   useEffect(() => {
@@ -297,7 +324,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
                           e.target.value,
                         )
                       }
-                      className="w-full pl-9 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-gray-600 placeholder-gray-400 p-0 text-sm resize-none min-h-[60px]"
+                      className="w-full pl-9 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-gray-600 placeholder-gray-400 p-0 text-sm resize-none min-h-15"
                       placeholder="Add a brief description or key points for this chapter..."
                     />
                   </div>
@@ -326,10 +353,11 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
             </div>
             <Button
               onClick={handleFinalizeBook}
+              isLoading={isFinalizing}
               className="w-full sm:w-auto justify-center cursor-pointer"
               icon={Sparkles}
             >
-              Create eBook
+              {isFinalizing ? "Creating..." : "Create eBook"}
             </Button>
           </div>
         </div>
