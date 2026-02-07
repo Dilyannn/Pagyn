@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Trash2,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   const [step, setStep] = useState(1);
@@ -41,17 +42,33 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
   };
 
   const handleGenerateOutline = async () => {
+    if (!title || !numChapters) {
+      toast.error("Please provide both a title and number of chapters");
+      return;
+    }
+
+    if (genre.length === 0) {
+      toast.error("Please select at least one genre");
+      return;
+    }
+
     setIsGeneratingOutline(true);
-    // Simulate AI generation
-    setTimeout(() => {
-      const mockChapters = Array.from({ length: numChapters }, (_, i) => ({
-        title: `Chapter ${i + 1}: ${topic || title}`,
-        description: `Overview of chapter ${i + 1} content focused on ${topic || title}.`,
-      }));
-      setChapters(mockChapters);
+
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.AI.GENERATE_OUTLINE, {
+        topic: title,
+        description: topic || "",
+        style: genre.join(", "),
+        numChapters: numChapters,
+      });
+      setChapters(response.data.chapters);
       setStep(2);
+      toast.success("Outline generated successfully! You can now review and edit the chapters.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to generate outline. Please try again.");
+    } finally {
       setIsGeneratingOutline(false);
-    }, 1500);
+    }
   };
 
   const handleChapterChange = (index, field, value) => {
