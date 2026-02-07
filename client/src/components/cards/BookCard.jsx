@@ -1,18 +1,18 @@
 import { useNavigate } from "react-router-dom"
-import { BASE_URL } from "../../utils/api"
 import { Edit, Trash2 } from "lucide-react"
+
+const SERVER_URL = import.meta.env.VITE_API_BASE_URL;
 
 function BookCard({ book, onDelete }) {
   const navigate = useNavigate();
 
   const coverArtUrl = book.coverArt && book.coverArt !== "default-cover.png"
-    ? (book.coverArt.startsWith('http') ? book.coverArt : `${BASE_URL}/books/${book._id}/cover`)
-    : (book.coverImage && book.coverImage.startsWith('http') ? book.coverImage : "");
+    ? (book.coverArt.startsWith('http') ? book.coverArt : `${SERVER_URL}/uploads/${book.coverArt}`)
+    : "";
 
   return (
     <div 
         onClick={() => navigate(`/view-book/${book._id}`)} 
-        // Fixed typo 'raelative' -> 'relative' from BookCard2 sample
         className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-100/50 cursor-pointer hover:-translate-y-1 block h-full w-full"
     >
       <div className="relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 w-full aspect-16/25">
