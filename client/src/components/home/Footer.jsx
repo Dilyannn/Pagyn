@@ -65,7 +65,7 @@ function Footer() {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">
-            © 2025 Pagyn. All rights reserved.
+            © {new Date().getFullYear()} Pagyn. All rights reserved.
           </p>
           <div className="flex items-center text-sm text-gray-500">
             <span>Made with</span>
