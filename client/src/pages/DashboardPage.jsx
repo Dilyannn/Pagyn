@@ -130,7 +130,7 @@ function DashboardPage() {
       <CreateBookModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
-        onSuccess={handleCreateBook}
+        onBookCreated={handleCreateBook}
       />
 
       <DeleteBookModal

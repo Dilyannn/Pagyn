@@ -1,37 +1,26 @@
 import { useState, useRef, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance.js";
 import { API_ENDPOINTS } from "../../utils/api.js";
-import { useAuth } from "../../context/AuthContext.js";
 
 import Modal from "../ui/Modal";
 import InputField from "../ui/InputField";
 import Button from "../ui/Button";
-import SelectField from "../ui/SelectField";
 
 import {
-  Plus,
   Sparkles,
-  Trash2,
-  ArrowLeft,
   BookOpen,
   Hash,
-  LightBulb,
-  Palette,
+  Lightbulb,
 } from "lucide-react";
-import toast from "react-hot-toast";
 
 function CreateBookModal({ isOpen, onClose, onBookCreated }) {
-  const { user } = useAuth();
-
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
   const [numChapters, setNumChapters] = useState(3);
 
   const [topic, setTopic] = useState(""); // for the AI outline generation
-  const [style, setStyle] = useState(""); // for the AI outline generation
   const [chapters, setChapters] = useState([]); // AI-generated chapters
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false); 
-  const [isFinalizing, setIsFinalizing] = useState(false);
   
   const chaptersRef = useRef([]); //& chapter container ref for auto-scrolling
 
@@ -40,10 +29,8 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
     setTitle("");
     setNumChapters(3);
     setTopic("");
-    setStyle("");
     setChapters([]);
     setIsGeneratingOutline(false);
-    setIsFinalizing(false);
   };
 
   const handleGenerateOutline = async () => {};
@@ -71,7 +58,7 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
         behavior: "smooth",
       });
     }
-  }), [chapters.length, step];
+  }, [chapters.length, step]);
 
   return (
     <Modal
@@ -83,57 +70,56 @@ function CreateBookModal({ isOpen, onClose, onBookCreated }) {
       title="Create New eBook"
     >
       {step === 1 && (
-        <div className="">
-          <div className="">
-            <div className="">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
+          <div className="flex items-center justify-center mb-10 relative px-10">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step >= 1 ? 'bg-violet-100 text-violet-700 ring-4 ring-violet-50' : 'bg-gray-100 text-gray-400'}`}>
               1
             </div>
-            <div className=""></div>
-            <div className="">
+            <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${step >= 2 ? 'bg-violet-200' : 'bg-gray-100'}`}></div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold z-10 transition-all duration-300 ${step >= 2 ? 'bg-violet-100 text-violet-700 ring-4 ring-violet-50' : 'bg-gray-100 text-gray-400'}`}>
               2
             </div>
           </div>
 
-          <InputField
-            icon={BookOpen}
-            label="Book Title"
-            placeholder="Enter your book title"
-            value={title} //TODO check if title or bookTitle
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          <div className="space-y-5">
+            <InputField
+              icon={BookOpen}
+              label="Book Title"
+              placeholder="Enter your book title"
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)}
+              className="bg-gray-50/50"
+            />
 
-          <InputField
-            icon={Hash}
-            label="Number of Chapters"
-            type="number"
-            placeholder="3"
-            value={numChapters}
-            onChange={(e) => setNumChapters(parseInt(e.target.value) || 1)}
-            min="1"
-            max="20"
-          />
+            <InputField
+              icon={Hash}
+              label="Number of Chapters"
+              type="number"
+              placeholder="3"
+              value={numChapters}
+              onChange={(e) => setNumChapters(parseInt(e.target.value) || 1)}
+              min="1"
+              max="20"
+              className="bg-gray-50/50"
+            />
 
-          <InputField
-            icon={LightBulb}
-            label="Book Topic (Optional)"
-            placeholder="e.g. Personal Finance, Mindfulness, etc."
-            value={topic} // TODO check if topic or aiTopic
-            onChange={(e) => setTopic(e.target.value)}
-            options={[
-              "Informative",
-              "Conversational",
-              "Storytelling",
-              "Casual",
-              "Professional",
-              "Humorous",
-            ]}
-          />
+            <InputField
+              icon={Lightbulb}
+              label="Book Topic (Optional)"
+              placeholder="e.g. Personal Finance, Mindfulness, etc."
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              className="bg-gray-50/50"
+            />
+          </div>
 
-          <div className="">
+          <div className="pt-4">
             <Button
               onClick={handleGenerateOutline}
               isLoading={isGeneratingOutline}
               icon={Sparkles}
+              size="lg"
+              className="w-full py-4 rounded-2xl shadow-xl shadow-violet-500/20"
             >
               Generate Outline with AI
             </Button>
