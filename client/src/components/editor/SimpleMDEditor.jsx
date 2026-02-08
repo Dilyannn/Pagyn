@@ -4,7 +4,6 @@ import { Type } from "lucide-react";
 function SimpleMDEditor({
   value,
   onChange,
-  options,
 }) {
   return (
     <div data-color-mode="light" className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">

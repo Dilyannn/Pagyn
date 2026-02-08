@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Sparkles, Type, Eye, Maximize2, Minimize2 } from "lucide-react";
 import Button from "../ui/Button.jsx";
 import InputField from "../ui/InputField.jsx";
@@ -51,7 +51,7 @@ function ChapterEditorTab({
       )
       // Unordered lists
       .replace(
-        /^\s*[\*\-]\s+(.*$)/gim,
+        /^\s*[*-]\s+(.*$)/gim,
         '<ul class="list-disc"><li class="ml-6 text-slate-700">$1</li></ul>',
       )
       // Ordered lists
@@ -182,7 +182,7 @@ function ChapterEditorTab({
             </div>
 
             {/* Preview Content */}
-            <div className="p-4 sm:p-6 min-h-[300px] sm:min-h-[400px]">
+            <div className="p-4 sm:p-6 min-h-75 sm:min-h-100">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
                 {currentChapter.title || "Untitled Chapter"}
               </h1>

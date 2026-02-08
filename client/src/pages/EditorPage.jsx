@@ -26,6 +26,7 @@ import SelectField from "../components/ui/SelectField.jsx";
 import ChapterSidebar from "../components/editor/ChapterSidebar.jsx";
 import BookDetailsTab from "../components/editor/BookDetailsTab.jsx";
 import ChapterEditorTab from "../components/editor/ChapterEditorTab.jsx";
+import DeleteChapterModal from "../components/modals/DeleteChapterModal.jsx";
 
 function EditorPage() {
   const { bookId } = useParams();
@@ -40,6 +41,10 @@ function EditorPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const fileInputRef = useRef(null);
+
+  //? Delete Chapter Modal States
+  const [isDeleteChapterModalOpen, setIsDeleteChapterModalOpen] = useState(false);
+  const [chapterToDeleteIndex, setChapterToDeleteIndex] = useState(null);
 
   //? AI Modal States
   const [isOutlineAIModalOpen, setIsOutlineAIModalOpen] = useState(false);
@@ -86,7 +91,32 @@ function EditorPage() {
     setChapterIdx(updatedChapters.length - 1);
   };
 
-  const handleDeleteChapter = (index) => {};
+  const handleDeleteChapter = (index) => {
+    if (book.chapters.length <= 1) {
+      toast.error("A book must have at least one chapter");
+      return;
+    }
+    setChapterToDeleteIndex(index);
+    setIsDeleteChapterModalOpen(true);
+  };
+
+  const confirmDeleteChapter = () => {
+    if (chapterToDeleteIndex === null) return;
+    
+    const updatedChapters = book.chapters.filter((_, i) => i !== chapterToDeleteIndex);
+    setBook((prev) => ({ ...prev, chapters: updatedChapters }));
+    
+    // Adjust selected chapter index
+    if (chapterIdx >= updatedChapters.length) {
+      setChapterIdx(Math.max(0, updatedChapters.length - 1));
+    } else if (chapterIdx > chapterToDeleteIndex) {
+        setChapterIdx(chapterIdx - 1);
+    }
+    
+    setIsDeleteChapterModalOpen(false);
+    setChapterToDeleteIndex(null);
+    toast.success("Chapter deleted successfully");
+  };
 
   const handleChaperReorder = (oldIndex, newIndex) => {};
 
@@ -256,6 +286,13 @@ function EditorPage() {
           </div>
         </main>
       </div>
+
+      <DeleteChapterModal
+        isOpen={isDeleteChapterModalOpen}
+        onClose={() => setIsDeleteChapterModalOpen(false)}
+        onConfirm={confirmDeleteChapter}
+        chapterTitle={book.chapters[chapterToDeleteIndex]?.title}
+      />
     </>
   );
 }
