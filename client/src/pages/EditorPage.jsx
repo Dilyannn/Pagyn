@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, act } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -24,6 +24,8 @@ import InputField from "../components/ui/InputField.jsx";
 import Modal from "../components/ui/Modal.jsx";
 import SelectField from "../components/ui/SelectField.jsx";
 import ChapterSidebar from "../components/editor/ChapterSidebar.jsx";
+import BookDetailsTab from "../components/editor/BookDetailsTab.jsx";
+import ChapterEditorTab from "../components/editor/ChapterEditorTab.jsx";
 
 function EditorPage() {
   const { bookId } = useParams();
@@ -220,6 +222,26 @@ function EditorPage() {
               </Button>
             </div>
           </header>
+
+          <div className="">
+            {activeTab === "editor" ? (
+              <ChapterEditorTab 
+                book={book}
+                chapterIdx={chapterIdx}
+                onChapterChange={handleChapterChange}
+                onGenerateChapterContent={handleGenerateChapterContent}
+                isGenerating={isGenerating}
+              />
+            ) : (
+              <BookDetailsTab
+                book={book}
+                onBookChange={handleBookChange}
+                onCoverArtUpload={handleCoverArtUpload}
+                fileInputRef={fileInputRef}
+                isUploading={isUploading}
+              />
+            )}
+          </div>
         </main>
       </div>
     </>
