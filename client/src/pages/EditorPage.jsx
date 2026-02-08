@@ -43,7 +43,8 @@ function EditorPage() {
   const fileInputRef = useRef(null);
 
   //? Delete Chapter Modal States
-  const [isDeleteChapterModalOpen, setIsDeleteChapterModalOpen] = useState(false);
+  const [isDeleteChapterModalOpen, setIsDeleteChapterModalOpen] =
+    useState(false);
   const [chapterToDeleteIndex, setChapterToDeleteIndex] = useState(null);
 
   //? AI Modal States
@@ -102,17 +103,19 @@ function EditorPage() {
 
   const confirmDeleteChapter = () => {
     if (chapterToDeleteIndex === null) return;
-    
-    const updatedChapters = book.chapters.filter((_, i) => i !== chapterToDeleteIndex);
+
+    const updatedChapters = book.chapters.filter(
+      (_, i) => i !== chapterToDeleteIndex,
+    );
     setBook((prev) => ({ ...prev, chapters: updatedChapters }));
-    
+
     // Adjust selected chapter index
     if (chapterIdx >= updatedChapters.length) {
       setChapterIdx(Math.max(0, updatedChapters.length - 1));
     } else if (chapterIdx > chapterToDeleteIndex) {
-        setChapterIdx(chapterIdx - 1);
+      setChapterIdx(chapterIdx - 1);
     }
-    
+
     setIsDeleteChapterModalOpen(false);
     setChapterToDeleteIndex(null);
     toast.success("Chapter deleted successfully");
@@ -129,7 +132,10 @@ function EditorPage() {
   const handleSave = async (bookToSave = book, showToast = true) => {
     setIsSaving(true);
     try {
-      await axiosInstance.put(API_ENDPOINTS.BOOKS.UPDATE_BOOK(bookId), bookToSave);
+      await axiosInstance.put(
+        API_ENDPOINTS.BOOKS.UPDATE_BOOK(bookId),
+        bookToSave,
+      );
       if (showToast) toast.success("Changes saved successfully");
     } catch (err) {
       console.error(err);
@@ -148,10 +154,14 @@ function EditorPage() {
     setIsUploading(true);
 
     try {
-      const response = await axiosInstance.put(API_ENDPOINTS.BOOKS.UPLOAD_COVER_ART(bookId), formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
+      const response = await axiosInstance.put(
+        API_ENDPOINTS.BOOKS.UPLOAD_COVER_ART(bookId),
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+
       setBook((prev) => ({ ...prev, coverArtUrl: response.data.coverArtUrl }));
       toast.success("Cover image uploaded successfully");
     } catch (err) {
@@ -162,9 +172,38 @@ function EditorPage() {
     }
   };
 
-  const handleGenerateOutline = async () => {};
+  const handleGenerateChapterContent = async (chapterIndex) => {
+    const chapter = book.chapters[chapterIndex];
+    if (!chapter.title || !chapter.title.trim()) {
+      toast.error("Chapter title cannot be empty");
+      return;
+    }
+    setIsGenerating(chapterIndex);
 
-  const handleGenerateChapterContent = async (chapterIndex) => {};
+    try {
+      const response = await axiosInstance.post(
+        API_ENDPOINTS.AI.GENERATE_CHAPTER_CONTENT,
+        {
+          chapterTitle: chapter.title,
+          chapterDescription: chapter.description || "",
+          style: aiStyle,
+        },
+      );
+      const updatedChapter = [...book.chapters];
+      updatedChapter[chapterIndex].content = response.data.content;
+
+      const updateBook = { ...book, chapters: updatedChapter };
+      setBook(updateBook);
+      toast.success("Chapter content generated successfully");
+
+      await handleSave(updateBook, false); // Auto-save generated content without showing toast
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to generate chapter content. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleExportPDF = async () => {};
 
@@ -244,7 +283,10 @@ function EditorPage() {
         <main className="flex-1 h-full flex flex-col">
           <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-slate-200 p-3 flex justify-between items-center">
             <div className="flex items-center gap-2 ">
-              <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-2 text-slate-500 hover:text-slate-800">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 text-slate-500 hover:text-slate-800"
+              >
                 <Menu className="w-6 h-6" />
               </button>
               <div className="hidden sm:flex space-x-1 bg-slate-100 p-1 rounded-lg">
@@ -276,7 +318,11 @@ function EditorPage() {
             <div className="flex items-center gap-2 sm:gap-4">
               <Dropdown
                 trigger={
-                  <Button variant="outline" icon={FileDown} className="cursor-pointer">
+                  <Button
+                    variant="outline"
+                    icon={FileDown}
+                    className="cursor-pointer"
+                  >
                     Export
                     <ChevronDown className="w-4 h-4 ml-1" />
                   </Button>
@@ -305,7 +351,7 @@ function EditorPage() {
 
           <div className="">
             {activeTab === "editor" ? (
-              <ChapterEditorTab 
+              <ChapterEditorTab
                 book={book}
                 selectedChapterIdx={chapterIdx}
                 onChapterChange={handleChapterChange}
@@ -332,7 +378,9 @@ function EditorPage() {
         chapterTitle={book.chapters[chapterToDeleteIndex]?.title}
       />
 
-      {isSaving && <div className="fixed inset-0 z-50 bg-transparent cursor-wait" />}
+      {isSaving && (
+        <div className="fixed inset-0 z-50 bg-transparent cursor-wait" />
+      )}
     </>
   );
 }
