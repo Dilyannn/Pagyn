@@ -118,9 +118,16 @@ function EditorPage() {
     toast.success("Chapter deleted successfully");
   };
 
-  const handleChaperReorder = (oldIndex, newIndex) => {};
+  const handleChaperReorder = (oldIndex, newIndex) => {
+    setBook((prev) => ({
+      ...prev,
+      chapters: arrayMove(prev.chapters, oldIndex, newIndex),
+    }));
+    setChapterIdx(newIndex); // keep the same chapter selected after reorder
+  };
 
   const handleSave = async (bookToSave = book, showToast = true) => {};
+  };
 
   const handleCoverArtUpload = async (e) => {};
 
