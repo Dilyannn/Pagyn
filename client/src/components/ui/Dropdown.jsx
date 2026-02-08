@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 
-function Dropdown({ children }) {
+function Dropdown({ trigger, children }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -20,20 +20,21 @@ function Dropdown({ children }) {
   return (
     <div ref={dropdownRef} className="relative inline-block text-left">
       <div onClick={() => setIsOpen(!isOpen)}>
-        {isOpen && (
-          <div 
-            className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg border border-slate-200 focus:outline-none"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="menu-button"
-            tabiIndex="-1"
-          >
-            <div role="none" className="py-1">
-              {children}
-            </div>
-          </div>
-        )}
+        {trigger}
       </div>
+      {isOpen && (
+        <div 
+          className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg border border-slate-200 focus:outline-none"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="menu-button"
+          tabIndex="-1"
+        >
+          <div role="none" className="py-1">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
   )
 };
@@ -42,7 +43,7 @@ export const DropdownItem = ({ children, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 text-left"
+      className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 text-left cursor-pointer"
       role="menuitem"
       tabIndex="-1"
     > 

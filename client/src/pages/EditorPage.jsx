@@ -101,7 +101,11 @@ function EditorPage() {
       <div className="flex bg-slate-50 font-sans relative min-h-screen">
         {/*//*Mobile */}
         {isSidebarOpen && (
-          <div className="fixed inset-0 z-40 flex md:hidden" role="dialog" aria-modal="true">
+          <div
+            className="fixed inset-0 z-40 flex md:hidden"
+            role="dialog"
+            aria-modal="true"
+          >
             <div
               className="fixed inset-0 bg-black/20 bg-opacity-75"
               aria-hidden="true"
@@ -137,6 +141,86 @@ function EditorPage() {
             <div aria-hidden="true" className="shrink-0 w-14" />
           </div>
         )}
+
+        {/*//* Desktop */}
+        <div className="hidden md:flex md:shrink-0 sticky top-0 h-screen">
+          <ChapterSidebar
+            book={book}
+            chapterIdx={chapterIdx}
+            onSelectedChapterChange={(idx) => {
+              setChapterIdx(idx);
+              setIsSidebarOpen(false);
+            }}
+            onAddChapter={handleAddChapter}
+            onDeleteChapter={handleDeleteChapter}
+            onGenerateChapterContent={handleGenerateChapterContent}
+            onChapterReorder={handleChaperReorder}
+            isGenerating={isGenerating}
+          />
+        </div>
+
+        <main className="flex-1 h-full flex flex-col">
+          <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-slate-200 p-3 flex justify-between items-center">
+            <div className="flex items-center gap-2 ">
+              <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-2 text-slate-500 hover:text-slate-800">
+                <Menu className="w-6 h-6" />
+              </button>
+              <div className="hidden sm:flex space-x-1 bg-slate-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setActiveTab("editor")}
+                  className={`flex items-center justify-center flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer ${
+                    activeTab === "editor"
+                      ? "bg-white text-slate-800 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editor
+                </button>
+                <button
+                  onClick={() => setActiveTab("details")}
+                  className={`flex items-center justify-center flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap cursor-pointer ${
+                    activeTab === "details"
+                      ? "bg-white text-slate-800 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <NotebookText className="w-4 h-4 mr-2" />
+                  Book Details
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Dropdown
+                trigger={
+                  <Button variant="outline" icon={FileDown} className="cursor-pointer">
+                    Export
+                    <ChevronDown className="w-4 h-4 ml-1" />
+                  </Button>
+                }
+              >
+                <DropdownItem onClick={handleExportPDF}>
+                  <FileText className="w-4 h-4 mr-2 text-slate-500" />
+                  Export as PDF
+                </DropdownItem>
+                <DropdownItem onClick={handleExportDOCX}>
+                  <Form className="w-4 h-4 mr-2 text-slate-500" />
+                  Export as DOCX
+                </DropdownItem>
+              </Dropdown>
+
+              <Button
+                onClick={() => handleSave()}
+                isLoading={isSaving}
+                icon={Save}
+                className="cursor-pointer"
+              >
+                Save
+              </Button>
+            </div>
+          </header>
+        </main>
       </div>
     </>
   );
