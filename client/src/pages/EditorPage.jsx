@@ -126,10 +126,41 @@ function EditorPage() {
     setChapterIdx(newIndex); // keep the same chapter selected after reorder
   };
 
-  const handleSave = async (bookToSave = book, showToast = true) => {};
+  const handleSave = async (bookToSave = book, showToast = true) => {
+    setIsSaving(true);
+    try {
+      await axiosInstance.put(API_ENDPOINTS.BOOKS.UPDATE_BOOK(bookId), bookToSave);
+      if (showToast) toast.success("Changes saved successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleCoverArtUpload = async (e) => {};
+  const handleCoverArtUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("coverArt", file);
+    setIsUploading(true);
+
+    try {
+      const response = await axiosInstance.put(API_ENDPOINTS.BOOKS.UPLOAD_COVER_ART(bookId), formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      
+      setBook((prev) => ({ ...prev, coverArtUrl: response.data.coverArtUrl }));
+      toast.success("Cover image uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to upload cover image. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleGenerateOutline = async () => {};
 
@@ -141,8 +172,8 @@ function EditorPage() {
 
   if (isLoading || !book) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Editing...</p>
+      <div className="flex items-center justify-center">
+        <p>Save</p>
       </div>
     );
   }
@@ -263,8 +294,8 @@ function EditorPage() {
 
               <Button
                 onClick={() => handleSave()}
-                isLoading={isSaving}
                 icon={Save}
+                disabled={isSaving}
                 className="cursor-pointer"
               >
                 Save
@@ -300,6 +331,8 @@ function EditorPage() {
         onConfirm={confirmDeleteChapter}
         chapterTitle={book.chapters[chapterToDeleteIndex]?.title}
       />
+
+      {isSaving && <div className="fixed inset-0 z-50 bg-transparent cursor-wait" />}
     </>
   );
 }
