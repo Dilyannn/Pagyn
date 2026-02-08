@@ -70,7 +70,13 @@ function EditorPage() {
     setBook((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChapterChange = (e) => {};
+  const handleChapterChange = (e) => {
+    const { name, value } = e.target;
+    setBook((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleAddChapter = () => {};
 
