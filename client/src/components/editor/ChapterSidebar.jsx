@@ -7,7 +7,63 @@ import { CSS } from "@dnd-kit/utilities";
 import Button from "../ui/Button.jsx";
 
 const SortableItem = ({ chapter, idx, selectedChapterIdx, onSelectChapter, onDeleteChapter, onGenerateChapterContent, isGenerating }) => {
-  return <div></div>
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: chapter._id || `new-${idx}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center rounded-lg border transition-all duration-200 relative ${
+        selectedChapterIdx === idx
+          ? "bg-violet-50/50 border-violet-200 shadow-sm"
+          : "bg-white border-slate-100 hover:border-slate-200 hover:shadow-sm"
+      }`}
+    >
+      <div
+        className="shrink-0 p-2 cursor-grab text-slate-400 hover:text-slate-600"
+        {...listeners}
+        {...attributes}
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+
+      <button
+        className={`flex-1 min-w-0 py-2.5 pr-3 text-sm text-left transition-colors ${
+          selectedChapterIdx === idx
+            ? "text-violet-800 font-semibold"
+            : "text-slate-600"
+        }`}
+        onClick={() => onSelectChapter(idx)}
+      >
+        <span className="block truncate">{chapter.title || "Untitled Chapter"}</span>
+      </button>
+
+      <div className="shrink-0 flex items-center gap-0.5 pr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button
+          className="p-1.5 rounded-md hover:bg-violet-100 transition-colors cursor-pointer"
+          onClick={(e) => { e.stopPropagation(); onGenerateChapterContent(idx); }}
+          title="Generate Content with AI"
+          disabled={isGenerating === idx}
+        >
+          <Sparkles className="w-4 h-4 text-violet-600" />
+        </button>
+
+        <button
+          className="p-1.5 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
+          onClick={(e) => { e.stopPropagation(); onDeleteChapter(idx); }}
+          title="Delete Chapter"
+          disabled={isGenerating === idx}
+        >
+          <Trash2 className="w-4 h-4 text-red-500" />
+        </button>
+      </div>
+    </div>
+  );
 };
 
 function ChapterSidebar({
@@ -43,6 +99,7 @@ function ChapterSidebar({
         <Button
           variant="ghost"
           size="sm"
+          className="cursor-pointer"
           onClick={() => navigate("/dashboard")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
