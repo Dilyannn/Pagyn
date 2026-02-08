@@ -205,7 +205,35 @@ function EditorPage() {
     }
   };
 
-  const handleExportPDF = async () => {};
+  const handleExportPDF = async () => {
+    toast.loading("Preparing PDF export...");
+
+    try {
+      const response = await axiosInstance.get(
+        API_ENDPOINTS.EXPORT.EXPORT_AS_PDF(bookId),
+        {
+          responseType: "blob",
+        },
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", `${book.title || "book"}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.dismiss();
+      toast.success("PDF export successful");
+    } catch (err) {
+      toast.dismiss();
+      console.error(err);
+      toast.error("Failed to export PDF. Please try again.");
+    }
+  };
 
   const handleExportDOCX = async () => {};
 
