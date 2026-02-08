@@ -70,15 +70,21 @@ function EditorPage() {
     setBook((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChapterChange = (e) => {
-    const { name, value } = e.target;
-    setBook((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChapterChange = (index, updatedChapter) => {
+    const newChapters = [...book.chapters];
+    newChapters[index] = updatedChapter;
+    setBook((prev) => ({ ...prev, chapters: newChapters }));
   };
 
-  const handleAddChapter = () => {};
+  const handleAddChapter = () => {
+    const newChapter = {
+      title: `Chapter ${book.chapters.length + 1}`,
+      content: "",
+    };
+    const updatedChapters = [...book.chapters, newChapter];
+    setBook((prev) => ({ ...prev, chapters: updatedChapters }));
+    setChapterIdx(updatedChapters.length - 1);
+  };
 
   const handleDeleteChapter = (index) => {};
 
@@ -233,7 +239,7 @@ function EditorPage() {
             {activeTab === "editor" ? (
               <ChapterEditorTab 
                 book={book}
-                chapterIdx={chapterIdx}
+                selectedChapterIdx={chapterIdx}
                 onChapterChange={handleChapterChange}
                 onGenerateChapterContent={handleGenerateChapterContent}
                 isGenerating={isGenerating}
