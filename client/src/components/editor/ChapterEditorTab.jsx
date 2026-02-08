@@ -26,23 +26,44 @@ function ChapterEditorTab({
   const formatMarkdown = (content) => {
     if (!content) return "";
     
-    // Convert headers
+    // Skip if already wrapped in HTML or empty
+    if (/^\s*<[a-z][\s\S]*>\s*$/i.test(content)) {
+      return content;
+    }
+
     let html = content
-      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold my-4">$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold my-3">$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold my-2">$1</h3>')
+      // Blockquotes
+      .replace(/^\s*>\s+(.*)$/gim, '<blockquote class="border-l-4 border-slate-300 pl-4 py-1 my-4 italic text-slate-600 bg-slate-50/50">$1</blockquote>')
+      // Headers
+      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold my-4 text-slate-900">$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold my-3 text-slate-800">$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold my-2 text-slate-800">$1</h3>')
       // Bold and italic
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       // Links
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank">$1</a>')
-      // Lists (simple)
-      .replace(/^\* (.*$)/gim, '<li class="ml-4">$1</li>')
-      // Line breaks and paragraphs
-      .replace(/\n\n/g, '</p><p class="my-2">')
-      .replace(/\n/g, '<br />');
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-violet-600 hover:underline" target="_blank">$1</a>')
+      // Unordered lists
+      .replace(/^\s*[\*\-]\s+(.*$)/gim, '<ul class="list-disc"><li class="ml-6 text-slate-700">$1</li></ul>')
+      // Ordered lists
+      .replace(/^\s*\d+\.\s+(.*$)/gim, '<ol class="list-decimal"><li class="ml-6 text-slate-700">$1</li></ol>')
+      // Clean up adjacent list tags
+      .replace(/<\/ul>\s*<ul class="list-disc">/g, "")
+      .replace(/<\/ol>\s*<ol class="list-decimal">/g, "");
 
-    return `<p class="my-2">${html}</p>`;
+    // Paragraph and Line Break handling
+    const sections = html.split(/\n\n+/);
+    return sections
+      .map((section) => {
+        const trimmed = section.trim();
+        if (!trimmed) return "";
+        // If the section already starts with a block-level HTML tag, don't wrap in <p>
+        if (/^<(h1|h2|h3|blockquote|ul|ol|li|p|div|section|article)/i.test(trimmed)) {
+          return trimmed.replace(/\n/g, "<br />");
+        }
+        return `<p class="my-3 leading-relaxed text-slate-700">${trimmed.replace(/\n/g, "<br />")}</p>`;
+      })
+      .join("");
   };
 
   const mdeOptions = useMemo(() => {
