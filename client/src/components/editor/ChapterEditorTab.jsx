@@ -24,6 +24,25 @@ function ChapterEditorTab({
 
   //? Simple markdown parser
   const formatMarkdown = (content) => {
+    if (!content) return "";
+    
+    // Convert headers
+    let html = content
+      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold my-4">$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold my-3">$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold my-2">$1</h3>')
+      // Bold and italic
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Links
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline" target="_blank">$1</a>')
+      // Lists (simple)
+      .replace(/^\* (.*$)/gim, '<li class="ml-4">$1</li>')
+      // Line breaks and paragraphs
+      .replace(/\n\n/g, '</p><p class="my-2">')
+      .replace(/\n/g, '<br />');
+
+    return `<p class="my-2">${html}</p>`;
   };
 
   const mdeOptions = useMemo(() => {
