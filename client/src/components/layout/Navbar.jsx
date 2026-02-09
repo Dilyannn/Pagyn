@@ -108,7 +108,11 @@ function Navbar({ showLinks = true, fullWidth = false }) {
           <div className="px-4 pt-4 border-t border-gray-100">
             {isAuthenticated ? (
               <div className="space-y-4 pb-4 px-2">
-                <div className="flex items-center space-x-3 p-2 bg-gray-50 rounded-xl">
+                <Link 
+                  to="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center space-x-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                >
                   <div className="h-10 w-10 bg-linear-to-br from-violet-400 to-violet-500 rounded-lg flex items-center justify-center shrink-0">
                     <span className="text-white font-bold text-lg">
                       {user?.username?.charAt(0).toUpperCase() || "U"}
@@ -122,7 +126,7 @@ function Navbar({ showLinks = true, fullWidth = false }) {
                       {user?.email}
                     </div>
                   </div>
-                </div>
+                </Link>
                 
                 <button
                   className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200"
