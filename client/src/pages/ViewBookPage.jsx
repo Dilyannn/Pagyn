@@ -24,6 +24,25 @@ const ViewBookSkeleton = () => (
 );
 
 function ViewBookPage() {
+  const [book, setBook] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { bookId } = useParams();
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const response = await axiosInstance.get(API_ENDPOINTS.BOOKS.GET_BOOK_BY_ID(bookId));
+        setBook(response.data);
+      } catch (error) {
+        console.error("Error fetching book:", error);
+        toast.error("Failed to load book. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBook();
+  }, [bookId]);
+
   return (
     <div>ViewBookPage</div>
   )
