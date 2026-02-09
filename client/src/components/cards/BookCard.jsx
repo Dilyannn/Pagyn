@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom"
-import { Edit, Trash2 } from "lucide-react"
-
-const SERVER_URL = import.meta.env.VITE_API_BASE_URL;
+import { Edit, Trash2, BookOpen } from "lucide-react"
+import { BACKEND_URL } from "../../utils/api";
 
 function BookCard({ book, onDelete }) {
   const navigate = useNavigate();
 
-  const coverArtUrl = book.coverArt && book.coverArt !== "default-cover.png"
-    ? (book.coverArt.startsWith('http') ? book.coverArt : `${SERVER_URL}/uploads/${book.coverArt}`)
-    : "";
+  const coverArtUrl = (book && book.coverArt && book.coverArt !== "default-cover.png")
+    ? (book.coverArt.startsWith("http") 
+        ? book.coverArt 
+        : `${BACKEND_URL}${book.coverArt.startsWith("/") ? "" : "/uploads/"}${book.coverArt}`.replace(/\\/g, "/"))
+    : null;
 
   return (
     <div 
@@ -16,12 +17,19 @@ function BookCard({ book, onDelete }) {
         className="group relative bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-100/50 cursor-pointer hover:-translate-y-1 block h-full w-full"
     >
       <div className="relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100 w-full aspect-16/25">
-        <img 
-          src={coverArtUrl}
-          alt={book.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => { e.target.style.display = "none" }}
-        />
+        {coverArtUrl ? (
+          <img 
+            src={coverArtUrl}
+            alt={book.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => { e.target.style.display = "none" }}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
+            <BookOpen className="w-16 h-16 mb-2" />
+            <span className="text-sm font-medium">No Cover</span>
+          </div>
+        )}
 
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2 z-20">
           <button

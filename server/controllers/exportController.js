@@ -335,11 +335,14 @@ const processInlineContent = (inlineTokens) => {
 //! Export book as DOCX
 const exportAsDocx = async (req, res) => {
   try { 
+    console.log(`[DOCX Export] Starting export for book: ${req.params.bookId}`);
     const book = await Book.findById(req.params.bookId);
 
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
+
+    console.log(`[DOCX Export] Book found: "${book.title}", coverArt: "${book.coverArt}"`);
 
     if (book.userId.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Unauthorized access to this book" });
@@ -350,25 +353,23 @@ const exportAsDocx = async (req, res) => {
     //* Cover Page if available
     const coverPage = [];
 
-    if (book.coverArt && !book.coverArt.includes("pravatar")) {
-      let coverImagePath = book.coverArt;
-      
-      // Fix path resolution
-      if (coverImagePath.startsWith("/") || coverImagePath.startsWith("\\")) {
-        coverImagePath = coverImagePath.substring(1);
-      }
-      
-      // Check if it's just a filename or relative path needing "uploads/"
-      if (!fs.existsSync(coverImagePath)) {
-        const tryUploads = path.join("uploads", path.basename(coverImagePath));
-        if (fs.existsSync(tryUploads)) {
-          coverImagePath = tryUploads;
-        }
-      }
+    if (book.coverArt && !book.coverArt.includes("pravatar") && book.coverArt !== "default-cover.png") {
+      // Resolve cover image to absolute path using UPLOADS_PATH
+      let coverImagePath = path.isAbsolute(book.coverArt)
+        ? book.coverArt
+        : path.join(UPLOADS_PATH, path.basename(book.coverArt));
+
+      console.log(`[DOCX Export] coverArt field: "${book.coverArt}"`);
+      console.log(`[DOCX Export] Resolved path: "${coverImagePath}"`);
+      console.log(`[DOCX Export] File exists: ${fs.existsSync(coverImagePath)}`);
 
       try {
         if (fs.existsSync(coverImagePath)) {
           const imageBuffer = fs.readFileSync(coverImagePath);
+          console.log(`[DOCX Export] Image buffer size: ${imageBuffer.length} bytes`);
+
+          const ext = path.extname(coverImagePath).toLowerCase().replace('.', '');
+          const imageType = ext === 'png' ? 'png' : ext === 'gif' ? 'gif' : 'jpg';
 
           //? add top spacing
           coverPage.push(
@@ -390,6 +391,7 @@ const exportAsDocx = async (req, res) => {
                     width: 400,
                     height: 550,
                   },
+                  type: imageType,
                 }),
               ],
               alignment: AlignmentType.CENTER,
@@ -407,6 +409,9 @@ const exportAsDocx = async (req, res) => {
               pageBreakBefore: true,
             })
           );
+          console.log(`[DOCX Export] Cover image added successfully`);
+        } else {
+          console.warn(`[DOCX Export] Cover image not found at: ${coverImagePath}`);
         }
       } catch (imageErr) {
         console.error(`Error including cover image in DOCX export from: ${coverImagePath}`, imageErr);
