@@ -44,7 +44,21 @@ function ViewBookPage() {
   }, [bookId]);
 
   return (
-    <div>ViewBookPage</div>
+    <DashboardMainLayout>
+      {isLoading ? (
+        <ViewBookSkeleton />
+        ) : book ? (
+          <ViewBook book={book} />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-slate-200 rounded-xl mt-8">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <Book className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Book Not Found</h3>
+            <p className="text-slate-500 mb-6 max-w-md">The book you are looking for does not exist or has been removed.</p>
+          </div>
+        )}
+    </DashboardMainLayout>
   )
 }
 
