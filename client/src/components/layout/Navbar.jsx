@@ -5,7 +5,7 @@ import ProfileDropdown from "./ProfileDropdown.jsx";
 
 import { Menu, X, BookOpen, LogOut } from "lucide-react";
 
-function Navbar({ showLinks = true }) {
+function Navbar({ showLinks = true, fullWidth = false }) {
   const { user, logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,7 +31,7 @@ function Navbar({ showLinks = true }) {
           : "bg-white border-b border-gray-100" 
         : "bg-white/5 backdrop-blur-md"
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className={`mx-auto px-6 lg:px-8 ${fullWidth ? 'w-full' : 'max-w-7xl'}`}>
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2.5 group">
             <div className="w-9 h-9 bg-linear-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-all duration-300">
@@ -89,19 +89,21 @@ function Navbar({ showLinks = true }) {
       </div>
 
       {/* Mobile menu */}      
-      {showLinks && isOpen && (
+      {isOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-400">
-          <nav className="px-4 pt-4 space-y-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="block px-4 py-2 text-2sm font-medium text-gray-700 hover:text-violet-600 rounded-lg hover:bg-violet-50/50 transition-all duration-200"
-              >
-                {link.name}
-              </a>
-            ))}
-          </nav>
+          {showLinks && (
+            <nav className="px-4 pt-4 space-y-1">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="block px-4 py-2 text-2sm font-medium text-gray-700 hover:text-violet-600 rounded-lg hover:bg-violet-50/50 transition-all duration-200"
+                >
+                  {link.name}
+                </a>
+              ))}
+            </nav>
+          )}
             
           <div className="px-4 pt-4 border-t border-gray-100">
             {isAuthenticated ? (

@@ -9,7 +9,7 @@ import { API_ENDPOINTS } from "../utils/api.js";
 import ViewBook from "../components/view/ViewBook.jsx"
 
 const ViewBookSkeleton = () => (
-  <div className="animate-pulse">
+  <div className="animate-pulse p-6">
     <div className="h-8 bg-slate-200 rounded w-1/2 mb-4"></div>
     <div className="h-4 bg-slate-200 rounded w-1/4 mb-8"></div>
     <div className="flex gap-8">
@@ -44,7 +44,7 @@ function ViewBookPage() {
   }, [bookId]);
 
   return (
-    <DashboardMainLayout>
+    <DashboardMainLayout fullWidth={true}>
       {isLoading ? (
         <ViewBookSkeleton />
         ) : book ? (

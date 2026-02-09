@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import { BookMarked } from "lucide-react";
 
 function ViewChapterSidebar({ 
   book, 
@@ -19,14 +19,14 @@ function ViewChapterSidebar({
 
       {/* Sidebar Container */}
       <aside className={`
-        fixed inset-y-0 left-0 z-30 w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-[60] w-80 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out
         lg:static lg:translate-x-0 lg:h-full lg:z-auto
         ${isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"}
       `}>
         {/* Header */}
         <div className="shrink-0 p-4 border-b border-slate-200 flex items-center gap-3">
           <div className="p-2 bg-violet-100 rounded-lg">
-            <BookOpen className="w-5 h-5 text-violet-600" />
+            <BookMarked className="w-5 h-5 text-violet-600" />
           </div>
           <h2 className="font-semibold text-slate-800 text-lg">Chapters</h2>
         </div>
@@ -40,7 +40,7 @@ function ViewChapterSidebar({
                 onSelectChapter(idx);
                 if (window.innerWidth < 1024 && onClose) onClose();
               }}
-              className={`w-full text-left px-3 py-3 rounded-lg border transition-all duration-200 group ${
+              className={`w-full text-left px-3 py-3 rounded-lg border transition-all duration-200 cursor-pointer group ${
                 chapterIdx === idx
                   ? "bg-violet-50 border-violet-100 shadow-sm"
                   : "bg-transparent border-transparent hover:bg-slate-50 hover:border-slate-100"

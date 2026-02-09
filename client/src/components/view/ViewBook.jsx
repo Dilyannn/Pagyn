@@ -24,7 +24,7 @@ function ViewBook({ book }) {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-white text-gray-900">
+    <div className="flex h-[calc(100vh-64px)] bg-white text-gray-900 border-t border-gray-200">
       <ViewChapterSidebar
         book={book}
         chapterIdx={chapterIdx}
@@ -43,7 +43,7 @@ function ViewBook({ book }) {
             </button>
             <div>
               <h1 className="font-semibold text-base md:text-lg truncate">{book.title}</h1>
-              <p className="text-sm text-gray-500">{book.author}</p>
+              <p className="text-sm text-gray-500">by {book.author}</p>
             </div>
           </div>
 
@@ -51,14 +51,14 @@ function ViewBook({ book }) {
             <div className="flex items-center gap-2 mr-4">
               <button
                 onClick={() => setFontSize(Math.max(14, fontSize - 2))}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-sm font-bold"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-sm font-bold cursor-pointer"
               >
                 A-
               </button>
               <span className="text-sm text-gray-500">{fontSize}px</span>
               <button
                 onClick={() => setFontSize(Math.min(36, fontSize + 2))}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-lg font-bold"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-lg font-bold cursor-pointer"
               >
                 A+
               </button>
@@ -85,7 +85,7 @@ function ViewBook({ book }) {
               <button
                 onClick={() => setChapterIdx(prev => Math.max(0, prev - 1))}
                 disabled={chapterIdx === 0}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors font-medium"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Previous Chapter</span>
@@ -98,7 +98,7 @@ function ViewBook({ book }) {
               <button
                 onClick={() => setChapterIdx(prev => Math.min(book.chapters.length - 1, prev + 1))}
                 disabled={chapterIdx === book.chapters.length - 1}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors font-medium"
               >
                 <span>Next Chapter</span>
                 <ChevronRight className="w-4 h-4" />

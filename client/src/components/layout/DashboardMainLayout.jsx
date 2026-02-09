@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
 
-const DashboardMainLayout = ({ children }) => {
+const DashboardMainLayout = ({ children, fullWidth = false }) => {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Decorative Blobs */}
@@ -11,9 +11,11 @@ const DashboardMainLayout = ({ children }) => {
         <div className="absolute -bottom-[10%] -right-[10%] w-125 h-125 bg-violet-200 rounded-full blur-[120px] opacity-30"></div>
       </div>
 
-      <Navbar showLinks={false} />
+      <Navbar showLinks={false} fullWidth={fullWidth} />
 
-      <main className="relative z-10 max-w-7xl mx-auto p-6 lg:p-10 min-h-[calc(100vh-64px)]">
+      <main className={`relative z-10 min-h-[calc(100vh-64px)] ${
+        fullWidth ? "w-full p-0" : "max-w-7xl mx-auto p-6 lg:p-10"
+      }`}>
         {children}
       </main>
     </div>
