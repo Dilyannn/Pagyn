@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, act } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -27,6 +27,7 @@ import ChapterSidebar from "../components/editor/ChapterSidebar.jsx";
 import BookDetailsTab from "../components/editor/BookDetailsTab.jsx";
 import ChapterEditorTab from "../components/editor/ChapterEditorTab.jsx";
 import DeleteChapterModal from "../components/modals/DeleteChapterModal.jsx";
+import GenerateWithAIModal from "../components/modals/GenerateWithAIModal.jsx";
 
 function EditorPage() {
   const { bookId } = useParams();
@@ -48,10 +49,10 @@ function EditorPage() {
   const [chapterToDeleteIndex, setChapterToDeleteIndex] = useState(null);
 
   //? AI Modal States
-  const [isOutlineAIModalOpen, setIsOutlineAIModalOpen] = useState(false);
-  const [aiTopic, setAiTopic] = useState("");
   const [aiStyle, setAiStyle] = useState("Informative, Storytelling");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [generationTargetIdx, setGenerationTargetIdx] = useState(null);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -172,13 +173,22 @@ function EditorPage() {
     }
   };
 
-  const handleGenerateChapterContent = async (chapterIndex) => {
+  const handleGenerateChapterContent = (chapterIndex) => {
     const chapter = book.chapters[chapterIndex];
     if (!chapter.title || !chapter.title.trim()) {
       toast.error("Chapter title cannot be empty");
       return;
     }
+    setGenerationTargetIdx(chapterIndex);
+    setIsAiModalOpen(true);
+  };
+
+  const executeGeneration = async (chapterDescription) => {
+    const chapterIndex = generationTargetIdx;
+    const chapter = book.chapters[chapterIndex];
+
     setIsGenerating(chapterIndex);
+    setIsAiModalOpen(false);
     document.body.style.cursor = "wait";
     const toastId = toast.loading("Generating chapter content...");
 
@@ -187,7 +197,7 @@ function EditorPage() {
         API_ENDPOINTS.AI.GENERATE_CHAPTER_CONTENT,
         {
           chapterTitle: chapter.title,
-          chapterDescription: chapter.description || "",
+          chapterDescription: chapterDescription,
           style: aiStyle,
         },
       );
@@ -202,9 +212,13 @@ function EditorPage() {
     } catch (err) {
       console.error(err);
       const serverMsg = err.response?.data?.message;
-      toast.error(serverMsg || "Failed to generate chapter content. Please try again.", { id: toastId });
+      toast.error(
+        serverMsg || "Failed to generate chapter content. Please try again.",
+        { id: toastId },
+      );
     } finally {
       setIsGenerating(false);
+      setGenerationTargetIdx(null);
       document.body.style.cursor = "default";
     }
   };
@@ -437,6 +451,16 @@ function EditorPage() {
         onClose={() => setIsDeleteChapterModalOpen(false)}
         onConfirm={confirmDeleteChapter}
         chapterTitle={book.chapters[chapterToDeleteIndex]?.title}
+      />
+
+      <GenerateWithAIModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        onGenerate={executeGeneration}
+        aiStyle={aiStyle}
+        setAiStyle={setAiStyle}
+        chapterTitle={book.chapters[generationTargetIdx]?.title}
+        isGenerating={isGenerating !== false}
       />
 
       {isSaving && (
