@@ -179,6 +179,8 @@ function EditorPage() {
       return;
     }
     setIsGenerating(chapterIndex);
+    document.body.style.cursor = "wait";
+    const toastId = toast.loading("Generating chapter content...");
 
     try {
       const response = await axiosInstance.post(
@@ -194,14 +196,16 @@ function EditorPage() {
 
       const updateBook = { ...book, chapters: updatedChapter };
       setBook(updateBook);
-      toast.success("Chapter content generated successfully");
+      toast.success("Chapter content generated successfully", { id: toastId });
 
       await handleSave(updateBook, false); // Auto-save generated content without showing toast
     } catch (err) {
       console.error(err);
-      toast.error("Failed to generate chapter content. Please try again.");
+      const serverMsg = err.response?.data?.message;
+      toast.error(serverMsg || "Failed to generate chapter content. Please try again.", { id: toastId });
     } finally {
       setIsGenerating(false);
+      document.body.style.cursor = "default";
     }
   };
 
