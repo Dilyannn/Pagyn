@@ -39,7 +39,7 @@ function SimpleMDEditor({
           onChange={onChange}
           height={400}
           preview={previewType}
-          hideToolbar={true}
+          hideToolbar={false}
           visibleDragbar={false}
         />
       </div>

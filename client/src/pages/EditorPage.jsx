@@ -401,7 +401,7 @@ function EditorPage() {
                   <Button
                     variant="outline"
                     icon={FileDown}
-                    className="cursor-pointer !px-2 !h-9 !text-xs sm:!px-6 sm:!h-11 sm:!text-base"
+                    className="cursor-pointer px-2! h-9! text-xs! sm:px-6! sm:h-11! sm:text-base!"
                   >
                     Export
                     <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
@@ -422,7 +422,7 @@ function EditorPage() {
                 onClick={() => handleSave()}
                 icon={Save}
                 disabled={isSaving}
-                className="cursor-pointer !px-3 !h-9 !text-xs sm:!px-6 sm:!h-11 sm:!text-base"
+                className="cursor-pointer px-3! h-9! text-xs! sm:px-6! sm:h-11! sm:text-base!"
               >
                 Save
               </Button>
