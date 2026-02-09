@@ -20,7 +20,7 @@ function SimpleMDEditor({
           onChange={onChange}
           height={400}
           preview="live"
-          hideMenu={true}
+          hideToolbar={true}
         />
       </div>
     </div>

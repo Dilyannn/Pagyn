@@ -155,14 +155,14 @@ function EditorPage() {
 
     try {
       const response = await axiosInstance.put(
-        API_ENDPOINTS.BOOKS.UPLOAD_COVER_ART(bookId),
+        API_ENDPOINTS.BOOKS.UPDATE_BOOK_COVER(bookId),
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         },
       );
 
-      setBook((prev) => ({ ...prev, coverArtUrl: response.data.coverArtUrl }));
+      setBook((prev) => ({ ...prev, coverArt: response.data.coverArt }));
       toast.success("Cover image uploaded successfully");
     } catch (err) {
       console.error(err);
@@ -239,7 +239,36 @@ function EditorPage() {
     }
   };
 
-  const handleExportDOCX = async () => {};
+  const handleExportDOCX = async () => {
+    toast.loading("Preparing DOCX export...");
+
+    try {
+      const response = await axiosInstance.get(
+        API_ENDPOINTS.EXPORT.EXPORT_AS_DOCX(bookId),
+        {
+          responseType: "blob",
+        },
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", `${book.title || "book"}.docx`);
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.dismiss();
+      toast.success("DOCX export successful");
+    } catch (err) {
+      toast.dismiss();
+      console.error(err);
+      toast.error("Failed to export DOCX. Please try again.");
+    }
+  };
 
   if (isLoading || !book) {
     return (
