@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom"
 import { Edit, Trash2, BookOpen } from "lucide-react"
-
-const SERVER_URL = import.meta.env.VITE_API_BASE_URL;
+import { BACKEND_URL } from "../../utils/api";
 
 function BookCard({ book, onDelete }) {
   const navigate = useNavigate();
 
-  const coverArtUrl = book.coverArt && book.coverArt !== "default-cover.png"
-    ? (book.coverArt.startsWith('http') ? book.coverArt : `${SERVER_URL}/uploads/${book.coverArt}`)
-    : "";
+  const coverArtUrl = (book && book.coverArt && book.coverArt !== "default-cover.png")
+    ? (book.coverArt.startsWith("http") 
+        ? book.coverArt 
+        : `${BACKEND_URL}${book.coverArt.startsWith("/") ? "" : "/uploads/"}${book.coverArt}`.replace(/\\/g, "/"))
+    : null;
 
   return (
     <div 
