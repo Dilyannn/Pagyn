@@ -286,8 +286,11 @@ function EditorPage() {
 
   if (isLoading || !book) {
     return (
-      <div className="flex items-center justify-center">
-        <p>Save</p>
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-500 font-medium tracking-tight">Loading your book...</p>
+        </div>
       </div>
     );
   }
@@ -364,42 +367,44 @@ function EditorPage() {
               >
                 <Menu className="w-6 h-6" />
               </button>
-              <div className="hidden sm:flex space-x-1 bg-slate-100 p-1 rounded-lg">
+              <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg">
                 <button
                   onClick={() => setActiveTab("editor")}
-                  className={`flex items-center justify-center flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer ${
+                  className={`flex items-center justify-center py-2 px-3 sm:px-4 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer ${
                     activeTab === "editor"
                       ? "bg-white text-slate-800 shadow-sm"
                       : "text-slate-500 hover:text-slate-700"
                   }`}
+                  title="Editor"
                 >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Editor
+                  <Edit className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Editor</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("details")}
-                  className={`flex items-center justify-center flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap cursor-pointer ${
+                  className={`flex items-center justify-center py-2 px-3 sm:px-4 text-sm font-medium rounded-md transition-colors duration-200 whitespace-nowrap cursor-pointer ${
                     activeTab === "details"
                       ? "bg-white text-slate-800 shadow-sm"
                       : "text-slate-500 hover:text-slate-700"
                   }`}
+                  title="Book Details"
                 >
-                  <NotebookText className="w-4 h-4 mr-2" />
-                  Book Details
+                  <NotebookText className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Details</span>
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1 sm:gap-4">
               <Dropdown
                 trigger={
                   <Button
                     variant="outline"
                     icon={FileDown}
-                    className="cursor-pointer"
+                    className="cursor-pointer !px-2 !h-9 !text-xs sm:!px-6 sm:!h-11 sm:!text-base"
                   >
                     Export
-                    <ChevronDown className="w-4 h-4 ml-1" />
+                    <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                   </Button>
                 }
               >
@@ -417,7 +422,7 @@ function EditorPage() {
                 onClick={() => handleSave()}
                 icon={Save}
                 disabled={isSaving}
-                className="cursor-pointer"
+                className="cursor-pointer !px-3 !h-9 !text-xs sm:!px-6 sm:!h-11 sm:!text-base"
               >
                 Save
               </Button>
