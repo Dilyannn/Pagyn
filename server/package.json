@@ -25,6 +25,7 @@
     "pdfkit": "^0.17.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "markdownlint": "^0.40.0"
   }
 }
